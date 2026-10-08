@@ -242,7 +242,7 @@ def main() -> None:
     p.add_argument("--image", type=Path, default=None, help="skip the file dialog and use this image")
     p.add_argument("--model", default="cpsam_v2", choices=["cpsam_v2", "cpsam", "cpdino", "cpdino-vitb"],
                    help="built-in Cellpose model (cpdino* need: pip install git+https://github.com/facebookresearch/dinov3)")
-    p.add_argument("--start-dir", type=Path, default=Path(r"C:\Users\Priyam\Desktop\Project\Cloud"),
+    p.add_argument("--start-dir", type=Path, default=Path(r""),
                    help="folder the file dialog opens in")
     p.add_argument("--out", type=Path, default=None, help="override the results folder")
     p.add_argument("--diameter", type=float, default=None,
