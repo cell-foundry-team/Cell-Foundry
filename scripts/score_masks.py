@@ -34,7 +34,7 @@ import tifffile
 from skimage import io as skio
 from skimage.segmentation import relabel_sequential
 
-DEFAULT_DATA_ROOT = Path(r"C:\Users\Priyam\Desktop\Project\Cloud")
+DEFAULT_DATA_ROOT = Path(r"")
 THRESHOLDS = [0.5, 0.75, 0.9]
 GT_EXTS = (".tif", ".tiff", ".png")
 
