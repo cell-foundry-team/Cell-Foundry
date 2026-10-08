@@ -1,8 +1,8 @@
 {
   "args": {
-    "group_dir": "C:\\Users\\Priyam\\Desktop\\Project\\Cloud\\Training_porcine_bf",
+    "group_dir": "path",
     "models": "['cpsam_v2', 'cpsam', 'cpdino', 'cpdino-vitb']",
-    "out_root": "C:\\Users\\Priyam\\Desktop\\Project\\Cloud_results",
+    "out_root": "path",
     "limit": "None",
     "pattern": "*_image.*",
     "flow_threshold": "0.4",
