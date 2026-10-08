@@ -59,8 +59,8 @@ import tifffile
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from score_masks import GT_EXTS, load_labels, score  # noqa: E402  (same metric code)
 
-DEFAULT_GROUP_DIR = Path(r"C:\Users\Priyam\Desktop\Project\Cloud\Training_porcine_bf")
-DEFAULT_OUT_ROOT = Path(r"C:\Users\Priyam\Desktop\Project\Cloud_results")
+DEFAULT_GROUP_DIR = Path(r"")
+DEFAULT_OUT_ROOT = Path(r"")
 DEFAULT_MODELS = ["cpsam_v2", "cpsam", "cpdino", "cpdino-vitb"]
 IMAGE_EXTS = (".png", ".tif", ".tiff", ".jpg", ".jpeg")
 
