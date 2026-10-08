@@ -1,0 +1,49 @@
+# --- Third-party material ---
+
+# Mentor's own "How We Work on Project Module" slide deck (THWS/Magda
+# Gregorová's material, not ours to redistribute). Kept locally for
+# reference only.
+01_Session1_ProjectModule_Intro_nonotes.pdf
+
+# The project brief itself, and any other IMES/THWS-authored PDFs, are
+# third-party documents, not ours to publish. Keep locally only; our own
+# notes/minutes quote the relevant passages instead.
+*Project Information.pdf
+*Updated Brief.pdf
+
+# --- Real IMES data ---
+
+# Microscopy images/annotations shared via THWS Cloud — institutional
+# research data, not ours to redistribute regardless of repo visibility.
+data/
+IMES_data/
+*.tif
+*.tiff
+*.czi
+*.nd2
+
+# --- Large/reproducible files ---
+
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# DINOCell training run outputs (checkpoints, metrics, curves) — regenerated
+# by running colab_dinocell_adipocyte_porcine.py, not source material.
+DINOCell/runs/
+
+# Downloaded model weights cache (also covered by *.pt above, named
+# explicitly since the whole folder, including its HF cache, is local-only).
+.dinocell_models/
+
+# --- OS / editor noise ---
+
+.DS_Store
+.idea/
+.vscode/
