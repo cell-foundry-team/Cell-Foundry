@@ -13,6 +13,16 @@ be installed together, so this folder is a standalone `uv` project
 (`uv init --no-workspace`), independent of the parent project's
 dependencies.
 
+**Note: DINOCell (the main project's dependency) and `cpdino`/`cpdino-vitb`
+(Cellpose's DINOv3-backed models, benchmarked here) are two different
+models, not the same thing under different names.** DINOCell is a
+separate package (DINOv2-based, per its own repo); `cpdino`/`cpdino-vitb`
+are built into Cellpose itself using Meta's newer DINOv3 backbone. Both
+get compared against each other as candidates, but they're architecturally
+distinct — worth keeping straight when discussing results with the team
+or IMES (e.g. the baseline Nicole refers to as "DINO-SAM" may be one or
+the other; confirm which before assuming).
+
 ## Setup
 
 With [uv](https://docs.astral.sh/uv/):
@@ -36,6 +46,20 @@ regenerate it with:
 ```bash
 uv export --format requirements-txt --no-hashes -o requirements.txt
 ```
+
+**After `uv sync` (or `pip install`), check the GPU is actually active:**
+
+```bash
+uv run python -c "import torch; print(torch.__version__, torch.cuda.is_available() or torch.backends.mps.is_available())"
+```
+
+This should print `True` at the end. On Windows specifically, PyPI's
+plain `torch` wheel is CPU-only — `pyproject.toml` pins a CUDA build from
+a separate index for `sys_platform == 'win32'` so `uv sync` gets this
+right automatically. If you install via plain `pip` on Windows instead,
+make sure the `--extra-index-url` line at the top of `requirements.txt`
+is honored (pip reads it directly from the file, no extra flag needed),
+or cpdino/cpdino-vitb will silently run on CPU instead of GPU.
 
 ## Running a benchmark
 

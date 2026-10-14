@@ -32,12 +32,17 @@ control = Negativ/_Ctrl) plus 'all'
     (robust to a few disastrous images), pooled count error, mean time, peak GPU memory.
     Timing excludes a warm-up run.
 
-Usage (env ``cf-core``, from the repo folder):
-    python scripts\\run_batch.py                                  # cpdino + cpdino-vitb (DINOv3-backed), porcine BF
-    python scripts\\run_batch.py --models cpdino cpdino-vitb
-    python scripts\\run_batch.py --group-dir "C:\\...\\Cloud\\Training_porcine_ph"
-    python scripts\\run_batch.py --limit 2                        # quick test on 2 images
-    python scripts\\run_batch.py --pattern "*Positiv_2[1-6]_image.*" --diameter 60   # subset + resize test
+Usage — two environments can run this script (see cellpose-env/README.md
+for why there are two):
+
+  conda, env ``cf-core`` (from the repo folder):
+    conda activate cf-core
+    python scripts\\run_batch.py --group-dir "<data>\\Training_porcine_bf" --out-root "<results>" --limit 2
+
+  uv, ``cellpose-env`` (from cellpose-env\\, see its README):
+    uv run python ..\\scripts\\run_batch.py --group-dir "<data>\\Training_porcine_bf" --out-root "<results>" --limit 2
+
+  Other options: --models cpdino cpdino-vitb, --pattern "*Positiv_2[1-6]_image.*", --diameter 60, --wandb
 """
 
 from __future__ import annotations
