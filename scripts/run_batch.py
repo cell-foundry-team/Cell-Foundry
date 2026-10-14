@@ -176,14 +176,6 @@ def versions(use_gpu: bool) -> dict:
                     cuda_available=torch.cuda.is_available())
         if use_gpu and torch.cuda.is_available():
             info["gpu"] = torch.cuda.get_device_name(0)
-        # Cellpose loads its own pretrained weights in bfloat16 by default
-        # (not fp32/fp16) — record this directly rather than assume, since
-        # precision mismatches between environments are a known risk (see
-        # the 8 Oct mentor minutes: Colab/FP16 vs. the app's own BF16).
-        from cellpose import models as _cp_models
-        _probe = _cp_models.CellposeModel(gpu=use_gpu, pretrained_model="cpsam")
-        info["model_dtype"] = str(next(_probe.net.parameters()).dtype)
-        del _probe
     except Exception as e:  # pragma: no cover
         info["version_error"] = repr(e)
     try:
@@ -202,6 +194,13 @@ def evaluate_model(name, pairs, a, mask_dir: Path, overlay_dir: Path | None) -> 
     torch = _cuda() if not a.cpu else None
     print(f"\n=== {name}: loading model")
     model = build_model(name, use_gpu=not a.cpu)
+    # Record the precision this specific model actually loaded in (Cellpose
+    # defaults to bfloat16, not fp32/fp16) — probed on the real model being
+    # benchmarked, not a separate stand-in, since the 8 Oct mentor minutes
+    # flag BF16-vs-FP16 mismatches (Colab/FP16 vs. the app's own BF16) as a
+    # real risk to track per run, not assume.
+    model_dtype = str(next(model.net.parameters()).dtype)
+    print(f"    {name} loaded as {model_dtype}")
 
     first = next((img for img, gt in pairs if gt is not None), None)
     if first is not None:  # warm-up: not timed, not recorded
@@ -244,7 +243,8 @@ def evaluate_model(name, pairs, a, mask_dir: Path, overlay_dir: Path | None) -> 
                    condition=parse_condition(base), n_true=res["n_true"],
                    n_pred=res["n_pred"], count_diff=res["n_pred"] - res["n_true"],
                    gt_median_diam_px=_fmt(gt_diam, 1), time_s=round(dt_s, 2),
-                   _peak_gpu_gb=_fmt(peak, 2))  # internal only (summary), not written per image
+                   _peak_gpu_gb=_fmt(peak, 2),  # internal only (summary), not written per image
+                   _model_dtype=model_dtype)  # internal only (run_config), not written per image
         if res["negative_image"]:  # 0 annotated cells: F1 undefined, n_pred = false detections
             msg = f"no annotated cells, false detections={res['n_pred']}"
         else:
@@ -364,31 +364,40 @@ def main(argv: list[str] | None = None) -> int:
 
         # Drop local filesystem paths from the logged config (they can leak a
         # username/home-directory layout); keep only the group folder's own
-        # name, which is already non-identifying.
+        # name, which is already non-identifying. W&B also collects host/
+        # username/machine info automatically by default — disable that too,
+        # since it's the same category of locally-identifying info we're
+        # already stripping from the config by hand.
         wandb_args = {k: v for k, v in config["args"].items() if k not in ("group_dir", "out_root")}
         run = wandb.init(project=a.wandb_project, entity=a.wandb_entity, name=run_dir.name,
                           config={**wandb_args, **config["versions"],
                                   "group": a.group_dir.name,
-                                  "n_images": len(pairs), "n_with_gt": n_gt})
+                                  "n_images": len(pairs), "n_with_gt": n_gt},
+                          settings=wandb.Settings(x_disable_meta=True, x_disable_machine_info=True))
 
     all_rows: list[dict] = []
+    model_dtypes: dict[str, str] = {}
     for name in a.models:
         model_rows = evaluate_model(name, pairs, a, run_dir / "masks" / name,
                                     None if a.no_overlays else run_dir / "overlays" / name)
+        if model_rows:
+            model_dtypes[name] = model_rows[0].get("_model_dtype", "unknown")
         if run is not None:
+            wandb.config.update({f"{name}/model_dtype": model_dtypes.get(name, "unknown")})
             for row in model_rows:
                 numeric = {f"{name}/{k}": v for k, v in row.items()
                            if isinstance(v, (int, float)) and v != ""}
                 wandb.log(numeric)
         all_rows += model_rows
         write_csv(run_dir / "per_image.csv", all_rows, PER_IMAGE_FIELDS)  # saved after each model
+    config["model_dtypes"] = model_dtypes
 
     summary = summarise(all_rows)
     write_csv(run_dir / "summary.csv", summary)
     config["finished"] = dt.datetime.now().isoformat()
     (run_dir / "run_config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
 
-    if run is not None:
+    if run is not None and summary:
         wandb.log({"summary": wandb.Table(columns=list(summary[0].keys()),
                                           data=[list(s.values()) for s in summary])})
         if a.wandb_overlays and not a.no_overlays:

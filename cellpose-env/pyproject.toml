@@ -1,7 +1,7 @@
 [project]
 name = "cellpose-env"
 version = "0.1.0"
-description = "Add your description here"
+description = "Isolated environment for Cellpose-family benchmarking (cpdino, cpdino-vitb), separate from the main project because dinocell pins cellpose==4.0.9 while these models need 4.2.1.1."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
