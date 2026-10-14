@@ -1,0 +1,32 @@
+[project]
+name = "cellpose-env"
+version = "0.1.0"
+description = "Isolated environment for Cellpose-family benchmarking (cpdino, cpdino-vitb), separate from the main project because dinocell pins cellpose==4.0.9 while these models need 4.2.1.1."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cellpose[gui]==4.2.1.1",
+    "dinov3",
+    "numpy>=2.5.4",
+    "scikit-image>=0.26.0",
+    "tifffile>=2026.9.20",
+    "torch==2.14.1",
+    "torchvision==0.29.1",
+    "wandb>=0.30.0",
+]
+
+[tool.uv.sources]
+dinov3 = { git = "https://github.com/facebookresearch/dinov3", rev = "6876159a11b4df116f30f667f8c9888617df0751" }
+# On Linux/macOS, PyPI's own torch wheels already bundle CUDA (or MPS
+# support, for macOS) correctly. On Windows, PyPI only ships CPU-only
+# torch wheels — without this override, `uv sync` silently installs a
+# CPU-only torch there, and cpdino/cpdino-vitb run on CPU with no error.
+# Caught by Priyam testing on his own Windows RTX 5060 machine; verified
+# working with this fix (torch 2.14.1+cu132, cuda available: True).
+torch = [{ index = "pytorch-cu132", marker = "sys_platform == 'win32'" }]
+torchvision = [{ index = "pytorch-cu132", marker = "sys_platform == 'win32'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu132"
+url = "https://download.pytorch.org/whl/cu132"
+explicit = true

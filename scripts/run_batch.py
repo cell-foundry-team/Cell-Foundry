@@ -32,12 +32,17 @@ control = Negativ/_Ctrl) plus 'all'
     (robust to a few disastrous images), pooled count error, mean time, peak GPU memory.
     Timing excludes a warm-up run.
 
-Usage (env ``cf-core``, from the repo folder):
-    python scripts\\run_batch.py                                  # all 4 Cellpose models, porcine BF
-    python scripts\\run_batch.py --models cpdino cpdino-vitb
-    python scripts\\run_batch.py --group-dir "C:\\...\\Cloud\\Training_porcine_ph"
-    python scripts\\run_batch.py --limit 2                        # quick test on 2 images
-    python scripts\\run_batch.py --pattern "*Positiv_2[1-6]_image.*" --diameter 60   # subset + resize test
+Usage — two environments can run this script (see cellpose-env/README.md
+for why there are two):
+
+  conda, env ``cf-core`` (from the repo folder):
+    conda activate cf-core
+    python scripts\\run_batch.py --group-dir "<data>\\Training_porcine_bf" --out-root "<results>" --limit 2
+
+  uv, ``cellpose-env`` (from cellpose-env\\, see its README):
+    uv run python ..\\scripts\\run_batch.py --group-dir "<data>\\Training_porcine_bf" --out-root "<results>" --limit 2
+
+  Other options: --models cpdino cpdino-vitb, --pattern "*Positiv_2[1-6]_image.*", --diameter 60, --wandb
 """
 
 from __future__ import annotations
@@ -61,7 +66,7 @@ from score_masks import GT_EXTS, load_labels, score  # noqa: E402  (same metric 
 
 DEFAULT_GROUP_DIR = Path(r"")
 DEFAULT_OUT_ROOT = Path(r"")
-DEFAULT_MODELS = ["cpsam_v2", "cpsam", "cpdino", "cpdino-vitb"]
+DEFAULT_MODELS = ["cpdino", "cpdino-vitb"]
 IMAGE_EXTS = (".png", ".tif", ".tiff", ".jpg", ".jpeg")
 
 PER_IMAGE_FIELDS = [
@@ -194,6 +199,13 @@ def evaluate_model(name, pairs, a, mask_dir: Path, overlay_dir: Path | None) -> 
     torch = _cuda() if not a.cpu else None
     print(f"\n=== {name}: loading model")
     model = build_model(name, use_gpu=not a.cpu)
+    # Record the precision this specific model actually loaded in (Cellpose
+    # defaults to bfloat16, not fp32/fp16) — probed on the real model being
+    # benchmarked, not a separate stand-in, since the 8 Oct mentor minutes
+    # flag BF16-vs-FP16 mismatches (Colab/FP16 vs. the app's own BF16) as a
+    # real risk to track per run, not assume.
+    model_dtype = str(next(model.net.parameters()).dtype)
+    print(f"    {name} loaded as {model_dtype}")
 
     first = next((img for img, gt in pairs if gt is not None), None)
     if first is not None:  # warm-up: not timed, not recorded
@@ -236,7 +248,8 @@ def evaluate_model(name, pairs, a, mask_dir: Path, overlay_dir: Path | None) -> 
                    condition=parse_condition(base), n_true=res["n_true"],
                    n_pred=res["n_pred"], count_diff=res["n_pred"] - res["n_true"],
                    gt_median_diam_px=_fmt(gt_diam, 1), time_s=round(dt_s, 2),
-                   _peak_gpu_gb=_fmt(peak, 2))  # internal only (summary), not written per image
+                   _peak_gpu_gb=_fmt(peak, 2),  # internal only (summary), not written per image
+                   _model_dtype=model_dtype)  # internal only (run_config), not written per image
         if res["negative_image"]:  # 0 annotated cells: F1 undefined, n_pred = false detections
             msg = f"no annotated cells, false detections={res['n_pred']}"
         else:
@@ -300,6 +313,9 @@ def summarise(rows: list[dict]) -> list[dict]:
 
 
 def write_csv(path: Path, rows: list[dict], fields: list[str] | None = None) -> None:
+    if not rows and fields is None:
+        path.write_text("", encoding="utf-8")  # no rows, no known columns: empty file, not a crash
+        return
     fields = fields or list(rows[0].keys())
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
@@ -324,6 +340,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cpu", action="store_true")
     p.add_argument("--no-overlays", action="store_true", help="don't save overlay PNGs")
     p.add_argument("--note", default="", help="free text stored in run_config.json")
+    p.add_argument("--wandb", action="store_true", help="also log this run to Weights & Biases")
+    p.add_argument("--wandb-project", default="cellfoundry", help="W&B project name")
+    p.add_argument("--wandb-entity", default=None,
+                   help="W&B team/org name, so runs are visible to teammates, not just you "
+                        "(or set the WANDB_ENTITY environment variable)")
+    p.add_argument("--wandb-overlays", action="store_true",
+                   help="ALSO upload overlay images to W&B (off by default: overlays are crops of "
+                        "real IMES microscopy images, which must not leave our control without "
+                        "IMES's explicit confirmation — see team .gitignore / Oct 8 minutes). "
+                        "Metrics-only logging (the default with --wandb) uploads no image data.")
     a = p.parse_args(argv)
 
     pairs = find_pairs(a.group_dir, a.limit, a.pattern)
@@ -340,16 +366,62 @@ def main(argv: list[str] | None = None) -> int:
               "images": [img.name for img, _ in pairs], "started": dt.datetime.now().isoformat()}
     (run_dir / "run_config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
 
+    run = None
+    if a.wandb:
+        import wandb  # optional dependency, only needed with --wandb
+
+        # Drop local filesystem paths from the logged config (they can leak a
+        # username/home-directory layout); keep only the group folder's own
+        # name, which is already non-identifying. W&B also collects host/
+        # username/machine info automatically by default — disable that too,
+        # since it's the same category of locally-identifying info we're
+        # already stripping from the config by hand.
+        wandb_args = {k: v for k, v in config["args"].items() if k not in ("group_dir", "out_root")}
+        run = wandb.init(project=a.wandb_project, entity=a.wandb_entity, name=run_dir.name,
+                          config={**wandb_args, **config["versions"],
+                                  "group": a.group_dir.name,
+                                  "n_images": len(pairs), "n_with_gt": n_gt},
+                          settings=wandb.Settings(x_disable_meta=True, x_disable_machine_info=True))
+
     all_rows: list[dict] = []
+    model_dtypes: dict[str, str] = {}
     for name in a.models:
-        all_rows += evaluate_model(name, pairs, a, run_dir / "masks" / name,
-                                   None if a.no_overlays else run_dir / "overlays" / name)
+        model_rows = evaluate_model(name, pairs, a, run_dir / "masks" / name,
+                                    None if a.no_overlays else run_dir / "overlays" / name)
+        if model_rows:
+            model_dtypes[name] = model_rows[0].get("_model_dtype", "unknown")
+        if run is not None:
+            wandb.config.update({f"{name}/model_dtype": model_dtypes.get(name, "unknown")})
+            for row in model_rows:
+                numeric = {f"{name}/{k}": v for k, v in row.items()
+                           if isinstance(v, (int, float)) and v != ""}
+                wandb.log(numeric)
+        all_rows += model_rows
         write_csv(run_dir / "per_image.csv", all_rows, PER_IMAGE_FIELDS)  # saved after each model
+    config["model_dtypes"] = model_dtypes
 
     summary = summarise(all_rows)
     write_csv(run_dir / "summary.csv", summary)
     config["finished"] = dt.datetime.now().isoformat()
     (run_dir / "run_config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
+
+    if run is not None:
+        try:
+            if summary:
+                wandb.log({"summary": wandb.Table(columns=list(summary[0].keys()),
+                                                  data=[list(s.values()) for s in summary])})
+            if a.wandb_overlays and not a.no_overlays:
+                for name in a.models:
+                    overlay_dir = run_dir / "overlays" / name
+                    if overlay_dir.is_dir():
+                        for img_path in sorted(overlay_dir.glob("*.png"))[:10]:  # cap to avoid huge uploads
+                            wandb.log({f"overlay/{name}": wandb.Image(str(img_path), caption=img_path.stem)})
+        finally:
+            # Always close the run explicitly, even if summary was empty or
+            # overlay logging raised — an implicitly-closed run (W&B's
+            # at-exit fallback) can show up as "crashed" in the dashboard
+            # instead of a clean "finished" state.
+            run.finish()
 
     print("\n=== summary per model and condition (mean +- std over images; pooled = all cells together)")
     print(f"{'model':<12} {'condition':<14} {'n':>3} {'F1@0.5':>13} {'pooled':>7} {'F1@0.75':>8} "
