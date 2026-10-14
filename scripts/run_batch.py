@@ -308,6 +308,9 @@ def summarise(rows: list[dict]) -> list[dict]:
 
 
 def write_csv(path: Path, rows: list[dict], fields: list[str] | None = None) -> None:
+    if not rows and fields is None:
+        path.write_text("", encoding="utf-8")  # no rows, no known columns: empty file, not a crash
+        return
     fields = fields or list(rows[0].keys())
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
@@ -397,16 +400,23 @@ def main(argv: list[str] | None = None) -> int:
     config["finished"] = dt.datetime.now().isoformat()
     (run_dir / "run_config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
 
-    if run is not None and summary:
-        wandb.log({"summary": wandb.Table(columns=list(summary[0].keys()),
-                                          data=[list(s.values()) for s in summary])})
-        if a.wandb_overlays and not a.no_overlays:
-            for name in a.models:
-                overlay_dir = run_dir / "overlays" / name
-                if overlay_dir.is_dir():
-                    for img_path in sorted(overlay_dir.glob("*.png"))[:10]:  # cap to avoid huge uploads
-                        wandb.log({f"overlay/{name}": wandb.Image(str(img_path), caption=img_path.stem)})
-        run.finish()
+    if run is not None:
+        try:
+            if summary:
+                wandb.log({"summary": wandb.Table(columns=list(summary[0].keys()),
+                                                  data=[list(s.values()) for s in summary])})
+            if a.wandb_overlays and not a.no_overlays:
+                for name in a.models:
+                    overlay_dir = run_dir / "overlays" / name
+                    if overlay_dir.is_dir():
+                        for img_path in sorted(overlay_dir.glob("*.png"))[:10]:  # cap to avoid huge uploads
+                            wandb.log({f"overlay/{name}": wandb.Image(str(img_path), caption=img_path.stem)})
+        finally:
+            # Always close the run explicitly, even if summary was empty or
+            # overlay logging raised — an implicitly-closed run (W&B's
+            # at-exit fallback) can show up as "crashed" in the dashboard
+            # instead of a clean "finished" state.
+            run.finish()
 
     print("\n=== summary per model and condition (mean +- std over images; pooled = all cells together)")
     print(f"{'model':<12} {'condition':<14} {'n':>3} {'F1@0.5':>13} {'pooled':>7} {'F1@0.75':>8} "
