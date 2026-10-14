@@ -33,7 +33,7 @@ control = Negativ/_Ctrl) plus 'all'
     Timing excludes a warm-up run.
 
 Usage (env ``cf-core``, from the repo folder):
-    python scripts\\run_batch.py                                  # all 4 Cellpose models, porcine BF
+    python scripts\\run_batch.py                                  # cpdino + cpdino-vitb (DINOv3-backed), porcine BF
     python scripts\\run_batch.py --models cpdino cpdino-vitb
     python scripts\\run_batch.py --group-dir "C:\\...\\Cloud\\Training_porcine_ph"
     python scripts\\run_batch.py --limit 2                        # quick test on 2 images
@@ -61,7 +61,7 @@ from score_masks import GT_EXTS, load_labels, score  # noqa: E402  (same metric 
 
 DEFAULT_GROUP_DIR = Path(r"")
 DEFAULT_OUT_ROOT = Path(r"")
-DEFAULT_MODELS = ["cpsam_v2", "cpsam", "cpdino", "cpdino-vitb"]
+DEFAULT_MODELS = ["cpdino", "cpdino-vitb"]
 IMAGE_EXTS = (".png", ".tif", ".tiff", ".jpg", ".jpeg")
 
 PER_IMAGE_FIELDS = [
@@ -176,6 +176,14 @@ def versions(use_gpu: bool) -> dict:
                     cuda_available=torch.cuda.is_available())
         if use_gpu and torch.cuda.is_available():
             info["gpu"] = torch.cuda.get_device_name(0)
+        # Cellpose loads its own pretrained weights in bfloat16 by default
+        # (not fp32/fp16) — record this directly rather than assume, since
+        # precision mismatches between environments are a known risk (see
+        # the 8 Oct mentor minutes: Colab/FP16 vs. the app's own BF16).
+        from cellpose import models as _cp_models
+        _probe = _cp_models.CellposeModel(gpu=use_gpu, pretrained_model="cpsam")
+        info["model_dtype"] = str(next(_probe.net.parameters()).dtype)
+        del _probe
     except Exception as e:  # pragma: no cover
         info["version_error"] = repr(e)
     try:
@@ -324,6 +332,16 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--cpu", action="store_true")
     p.add_argument("--no-overlays", action="store_true", help="don't save overlay PNGs")
     p.add_argument("--note", default="", help="free text stored in run_config.json")
+    p.add_argument("--wandb", action="store_true", help="also log this run to Weights & Biases")
+    p.add_argument("--wandb-project", default="cellfoundry", help="W&B project name")
+    p.add_argument("--wandb-entity", default=None,
+                   help="W&B team/org name, so runs are visible to teammates, not just you "
+                        "(or set the WANDB_ENTITY environment variable)")
+    p.add_argument("--wandb-overlays", action="store_true",
+                   help="ALSO upload overlay images to W&B (off by default: overlays are crops of "
+                        "real IMES microscopy images, which must not leave our control without "
+                        "IMES's explicit confirmation — see team .gitignore / Oct 8 minutes). "
+                        "Metrics-only logging (the default with --wandb) uploads no image data.")
     a = p.parse_args(argv)
 
     pairs = find_pairs(a.group_dir, a.limit, a.pattern)
@@ -340,16 +358,46 @@ def main(argv: list[str] | None = None) -> int:
               "images": [img.name for img, _ in pairs], "started": dt.datetime.now().isoformat()}
     (run_dir / "run_config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
 
+    run = None
+    if a.wandb:
+        import wandb  # optional dependency, only needed with --wandb
+
+        # Drop local filesystem paths from the logged config (they can leak a
+        # username/home-directory layout); keep only the group folder's own
+        # name, which is already non-identifying.
+        wandb_args = {k: v for k, v in config["args"].items() if k not in ("group_dir", "out_root")}
+        run = wandb.init(project=a.wandb_project, entity=a.wandb_entity, name=run_dir.name,
+                          config={**wandb_args, **config["versions"],
+                                  "group": a.group_dir.name,
+                                  "n_images": len(pairs), "n_with_gt": n_gt})
+
     all_rows: list[dict] = []
     for name in a.models:
-        all_rows += evaluate_model(name, pairs, a, run_dir / "masks" / name,
-                                   None if a.no_overlays else run_dir / "overlays" / name)
+        model_rows = evaluate_model(name, pairs, a, run_dir / "masks" / name,
+                                    None if a.no_overlays else run_dir / "overlays" / name)
+        if run is not None:
+            for row in model_rows:
+                numeric = {f"{name}/{k}": v for k, v in row.items()
+                           if isinstance(v, (int, float)) and v != ""}
+                wandb.log(numeric)
+        all_rows += model_rows
         write_csv(run_dir / "per_image.csv", all_rows, PER_IMAGE_FIELDS)  # saved after each model
 
     summary = summarise(all_rows)
     write_csv(run_dir / "summary.csv", summary)
     config["finished"] = dt.datetime.now().isoformat()
     (run_dir / "run_config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
+
+    if run is not None:
+        wandb.log({"summary": wandb.Table(columns=list(summary[0].keys()),
+                                          data=[list(s.values()) for s in summary])})
+        if a.wandb_overlays and not a.no_overlays:
+            for name in a.models:
+                overlay_dir = run_dir / "overlays" / name
+                if overlay_dir.is_dir():
+                    for img_path in sorted(overlay_dir.glob("*.png"))[:10]:  # cap to avoid huge uploads
+                        wandb.log({f"overlay/{name}": wandb.Image(str(img_path), caption=img_path.stem)})
+        run.finish()
 
     print("\n=== summary per model and condition (mean +- std over images; pooled = all cells together)")
     print(f"{'model':<12} {'condition':<14} {'n':>3} {'F1@0.5':>13} {'pooled':>7} {'F1@0.75':>8} "

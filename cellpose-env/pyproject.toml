@@ -1,0 +1,17 @@
+[project]
+name = "cellpose-env"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "cellpose[gui]==4.2.1.1",
+    "dinov3",
+    "numpy>=2.5.4",
+    "scikit-image>=0.26.0",
+    "tifffile>=2026.9.20",
+    "wandb>=0.30.0",
+]
+
+[tool.uv.sources]
+dinov3 = { git = "https://github.com/facebookresearch/dinov3", rev = "6876159a11b4df116f30f667f8c9888617df0751" }
