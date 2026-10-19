@@ -167,7 +167,8 @@ def evaluate(pipeline, pairs, mask_dir: Path, overlay_dir: Path | None) -> list[
         row.update(model=name, image=base, series=parse_series(base),
                    condition=parse_condition(base), n_true=res["n_true"],
                    n_pred=res["n_pred"], count_diff=res["n_pred"] - res["n_true"],
-                   gt_median_diam_px=_fmt(gt_diam, 1), time_s=round(dt_s, 2))
+                   gt_median_diam_px=_fmt(gt_diam, 1), time_s=round(dt_s, 2),
+                   _peak_gpu_gb=float("nan"))  # not tracked for DINOCell yet
         if res["negative_image"]:
             msg = f"no annotated cells, false detections={res['n_pred']}"
         else:
