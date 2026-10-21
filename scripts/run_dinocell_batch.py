@@ -123,7 +123,7 @@ def versions(device) -> dict:
 
 
 # ----------------------------------------------------------------------------- main
-def evaluate(pipeline, pairs, mask_dir: Path, overlay_dir: Path | None) -> list[dict]:
+def evaluate(pipeline, pairs, mask_dir: Path, overlay_dir: Path | None, model_dtype: str) -> list[dict]:
     name = "dinocell"
 
     first = next((img for img, gt in pairs if gt is not None), None)
@@ -168,7 +168,8 @@ def evaluate(pipeline, pairs, mask_dir: Path, overlay_dir: Path | None) -> list[
                    condition=parse_condition(base), n_true=res["n_true"],
                    n_pred=res["n_pred"], count_diff=res["n_pred"] - res["n_true"],
                    gt_median_diam_px=_fmt(gt_diam, 1), time_s=round(dt_s, 2),
-                   _peak_gpu_gb=float("nan"))  # not tracked for DINOCell yet
+                   _peak_gpu_gb=float("nan"),  # not tracked for DINOCell yet
+                   _model_dtype=model_dtype)  # internal only (run_config), not written per image
         if res["negative_image"]:
             msg = f"no annotated cells, false detections={res['n_pred']}"
         else:
@@ -248,6 +249,16 @@ def main(argv: list[str] | None = None) -> int:
     device = _device()
     print(f"loading DINOCell from {a.weights} on {device}")
     model = build_model(a.weights, device)
+    # Record the precision the checkpoint actually loaded in, the same way
+    # run_batch.py does for the Cellpose-family models -- build_model() never
+    # calls .half()/.bfloat16() or sets up autocast, so this model runs in
+    # whatever dtype a.weights was saved in (most likely fp32, since the
+    # notebook's own training run merged LoRA back into fp32 base weights
+    # before saving -- but this is probed, not assumed, exactly because
+    # three different precisions (IMES app BF16, Colab training FP16, this
+    # checkpoint's actual saved dtype) are already known to disagree).
+    model_dtype = str(next(model.parameters()).dtype)
+    print(f"    dinocell loaded as {model_dtype}")
     pipeline = build_pipeline(model, device, a.crop_size, a.overlap_size)
 
     run_dir = a.out_root / "batch" / f"{dt.datetime.now():%Y%m%d-%H%M%S}_{a.group_dir.name}_dinocell"
@@ -267,9 +278,12 @@ def main(argv: list[str] | None = None) -> int:
                                   "n_images": len(pairs), "n_with_gt": n_gt},
                           settings=wandb.Settings(x_disable_meta=True, x_disable_machine_info=True))
 
-    rows = evaluate(pipeline, pairs, run_dir / "masks", None if a.no_overlays else run_dir / "overlays")
+    rows = evaluate(pipeline, pairs, run_dir / "masks",
+                     None if a.no_overlays else run_dir / "overlays", model_dtype)
     write_csv(run_dir / "per_image.csv", rows, PER_IMAGE_FIELDS)
+    config["model_dtype"] = model_dtype
     if run is not None:
+        wandb.config.update({"dinocell/model_dtype": model_dtype})
         for row in rows:
             numeric = {f"dinocell/{k}": v for k, v in row.items()
                        if isinstance(v, (int, float)) and v != ""}
