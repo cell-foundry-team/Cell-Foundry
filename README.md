@@ -61,7 +61,7 @@ Every batch run writes to a **new timestamped folder**; nothing is overwritten. 
 
 ## Environments
 
-The repository needs two Python environments that cannot be installed together: `dinocell==0.74` requires `cellpose==4.0.9`, while the DINOv3-based Cellpose models need `cellpose==4.2.1.1`. The reasons and setup commands are in [cellpose-env/README.md](cellpose-env/README.md). For Windows with conda see [Environments/cf-core-env-setup.md](Environments/cf-core-env-setup.md). A setup file for the main (DINOCell) environment is not yet part of the repository.
+The repository needs two Python environments that cannot be installed together: `dinocell==0.74` requires `cellpose==4.0.9`, while the DINOv3-based Cellpose models need `cellpose==4.2.1.1`. The reasons and setup commands are in [cellpose-env/README.md](cellpose-env/README.md). For Windows with conda see [Environments/cf-core-env-setup.md](Environments/cf-core-env-setup.md). The main (DINOCell) environment is defined by `pyproject.toml` and `uv.lock` in the repository root: run `uv sync` there. On Windows it installs a CUDA build of PyTorch (cu128); check afterwards with `uv run python -c "import torch; print(torch.cuda.is_available())"`.
 
 Quick start for the Cellpose models:
 
