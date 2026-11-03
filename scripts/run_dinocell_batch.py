@@ -142,6 +142,10 @@ def evaluate(pipeline, pairs, mask_dir: Path, overlay_dir: Path | None, model_dt
         print(f"    warm-up on {first.name}: {time.time() - t0:.1f} s (not recorded)")
 
     rows = []
+    # masks go in a "<model>/" subfolder (not directly in mask_dir), matching run_batch.py /
+    # run_batch_v2.py's layout (masks/<model>/<name>_<model>_instances.tif), so score_masks_v2.py
+    # --batch-dirs and experiments/cpdino_vitb_finetune_v1's shared protocol can both read it.
+    mask_dir = mask_dir / name
     mask_dir.mkdir(parents=True, exist_ok=True)
     if overlay_dir:
         overlay_dir.mkdir(parents=True, exist_ok=True)
