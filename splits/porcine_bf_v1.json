@@ -1,0 +1,129 @@
+{
+  "name": "porcine_bf_v1",
+  "seed": 42,
+  "fingerprint": "22d6fd1c60e2",
+  "group_dir_name": "Training_porcine_bf",
+  "n_images": 28,
+  "plan": {
+    "control": {
+      "train": 1,
+      "val": 1,
+      "test": 1
+    },
+    "pad11_diff": {
+      "train": 1,
+      "val": 0,
+      "test": 1
+    },
+    "hard_21_26": {
+      "train": 3,
+      "val": 1,
+      "test": 2
+    },
+    "positiv": {
+      "train": 13,
+      "val": 2,
+      "test": 2
+    }
+  },
+  "splits": {
+    "train": [
+      "CLD-AIM-04 PIG 10x Training Positiv_10",
+      "CLD-AIM-04 PIG 10x Training Positiv_11",
+      "CLD-AIM-04 PIG 10x Training Positiv_14",
+      "CLD-AIM-04 PIG 10x Training Positiv_15",
+      "CLD-AIM-04 PIG 10x Training Positiv_17",
+      "CLD-AIM-04 PIG 10x Training Positiv_18",
+      "CLD-AIM-04 PIG 10x Training Positiv_21",
+      "CLD-AIM-04 PIG 10x Training Positiv_24",
+      "CLD-AIM-04 PIG 10x Training Positiv_25",
+      "CLD-AIM-04 PIG 10x Training Positiv_27",
+      "CLD-AIM-04 PIG 10x Training Positiv_28",
+      "CLD-AIM-04 PIG 10x Training Positiv_29",
+      "CLD-AIM-04 PIG 10x Training Positiv_30",
+      "CLD-AIM-04 PIG 10x Training Positiv_7",
+      "CLD-AIM-04 PIG 10x Training Positiv_8",
+      "CLD-AIM-04 PIG 10x Training Positiv_9",
+      "PAD11a_D1_10x_Ctrl",
+      "PAD11c_B5_10x_Diff"
+    ],
+    "val": [
+      "CLD-AIM-04 PIG 10x Training Negativ_2",
+      "CLD-AIM-04 PIG 10x Training Positiv_16",
+      "CLD-AIM-04 PIG 10x Training Positiv_19",
+      "CLD-AIM-04 PIG 10x Training Positiv_22"
+    ],
+    "test": [
+      "CLD-AIM-04 PIG 10x Training Positiv_12",
+      "CLD-AIM-04 PIG 10x Training Positiv_13",
+      "CLD-AIM-04 PIG 10x Training Positiv_23",
+      "CLD-AIM-04 PIG 10x Training Positiv_26",
+      "PAD11a_B1_10x_Diff",
+      "PAD11c_D5_10x_Ctrl"
+    ]
+  },
+  "strata": {
+    "control": {
+      "train": [
+        "PAD11a_D1_10x_Ctrl"
+      ],
+      "val": [
+        "CLD-AIM-04 PIG 10x Training Negativ_2"
+      ],
+      "test": [
+        "PAD11c_D5_10x_Ctrl"
+      ]
+    },
+    "pad11_diff": {
+      "train": [
+        "PAD11c_B5_10x_Diff"
+      ],
+      "val": [],
+      "test": [
+        "PAD11a_B1_10x_Diff"
+      ]
+    },
+    "hard_21_26": {
+      "train": [
+        "CLD-AIM-04 PIG 10x Training Positiv_21",
+        "CLD-AIM-04 PIG 10x Training Positiv_24",
+        "CLD-AIM-04 PIG 10x Training Positiv_25"
+      ],
+      "val": [
+        "CLD-AIM-04 PIG 10x Training Positiv_22"
+      ],
+      "test": [
+        "CLD-AIM-04 PIG 10x Training Positiv_23",
+        "CLD-AIM-04 PIG 10x Training Positiv_26"
+      ]
+    },
+    "positiv": {
+      "train": [
+        "CLD-AIM-04 PIG 10x Training Positiv_10",
+        "CLD-AIM-04 PIG 10x Training Positiv_11",
+        "CLD-AIM-04 PIG 10x Training Positiv_14",
+        "CLD-AIM-04 PIG 10x Training Positiv_15",
+        "CLD-AIM-04 PIG 10x Training Positiv_17",
+        "CLD-AIM-04 PIG 10x Training Positiv_18",
+        "CLD-AIM-04 PIG 10x Training Positiv_27",
+        "CLD-AIM-04 PIG 10x Training Positiv_28",
+        "CLD-AIM-04 PIG 10x Training Positiv_29",
+        "CLD-AIM-04 PIG 10x Training Positiv_30",
+        "CLD-AIM-04 PIG 10x Training Positiv_7",
+        "CLD-AIM-04 PIG 10x Training Positiv_8",
+        "CLD-AIM-04 PIG 10x Training Positiv_9"
+      ],
+      "val": [
+        "CLD-AIM-04 PIG 10x Training Positiv_16",
+        "CLD-AIM-04 PIG 10x Training Positiv_19"
+      ],
+      "test": [
+        "CLD-AIM-04 PIG 10x Training Positiv_12",
+        "CLD-AIM-04 PIG 10x Training Positiv_13"
+      ]
+    }
+  },
+  "note": "Whole-image split. val = development check set; test = use once at the end.",
+  "created": "2026-11-02T23:52:36",
+  "script": "make_split.py"
+}
