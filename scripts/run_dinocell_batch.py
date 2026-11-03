@@ -123,7 +123,16 @@ def versions(device) -> dict:
 
 
 # ----------------------------------------------------------------------------- main
-def evaluate(pipeline, pairs, mask_dir: Path, overlay_dir: Path | None, model_dtype: str) -> list[dict]:
+# DINOCell's own pipeline.run() turns the predicted flows into cells with these values
+# (dinocell/pipeline.py: flow_threshold=0, cellprob_threshold=0.5; niter=250 is fixed inside
+# cells_from_flows). IMES's notebook uses the same two thresholds for its validation F1.
+DEFAULT_FLOW_THRESHOLD = 0.0
+DEFAULT_CELLPROB_THRESHOLD = 0.5
+
+
+def evaluate(pipeline, pairs, mask_dir: Path, overlay_dir: Path | None, model_dtype: str,
+             flow_threshold: float = DEFAULT_FLOW_THRESHOLD,
+             cellprob_threshold: float = DEFAULT_CELLPROB_THRESHOLD) -> list[dict]:
     name = "dinocell"
 
     first = next((img for img, gt in pairs if gt is not None), None)
@@ -143,7 +152,11 @@ def evaluate(pipeline, pairs, mask_dir: Path, overlay_dir: Path | None, model_dt
             continue
         img = load_labels_image(img_path)
         t0 = time.time()
-        pred, _preds, _resized_img = pipeline.run(img, return_raw_preds=True)
+        pred, preds, _resized_img = pipeline.run(img, return_raw_preds=True)
+        if (flow_threshold, cellprob_threshold) != (DEFAULT_FLOW_THRESHOLD, DEFAULT_CELLPROB_THRESHOLD):
+            # non-default thresholds: rebuild the cells from the same raw flows (no second model pass)
+            pred = pipeline.cells_from_flows(preds[0], preds[1], preds[2],
+                                             flow_threshold=flow_threshold, cellprob_threshold=cellprob_threshold)
         dt_s = time.time() - t0
 
         tifffile.imwrite(mask_dir / f"{base}_{name}_instances.tif", pred.astype(np.uint16))
@@ -225,6 +238,12 @@ def main(argv: list[str] | None = None) -> int:
                         "but cost more compute (more pixels processed multiple times) and blend "
                         "predictions over a wider area. Not validated by IMES for this data -- "
                         "check overlay images for boundary artefacts before trusting a value.")
+    p.add_argument("--flow-threshold", type=float, default=DEFAULT_FLOW_THRESHOLD,
+                   help="Cellpose flow-error threshold used to turn flows into cells "
+                        f"(default {DEFAULT_FLOW_THRESHOLD}, DINOCell's own value; higher = stricter)")
+    p.add_argument("--cellprob-threshold", type=float, default=DEFAULT_CELLPROB_THRESHOLD,
+                   help="cell-probability threshold (default "
+                        f"{DEFAULT_CELLPROB_THRESHOLD}, DINOCell's own value; lower = more/larger cells)")
     p.add_argument("--no-overlays", action="store_true", help="don't save overlay PNGs")
     p.add_argument("--note", default="", help="free text stored in run_config.json")
     p.add_argument("--wandb", action="store_true", help="also log this run to Weights & Biases")
@@ -279,7 +298,8 @@ def main(argv: list[str] | None = None) -> int:
                           settings=wandb.Settings(x_disable_meta=True, x_disable_machine_info=True))
 
     rows = evaluate(pipeline, pairs, run_dir / "masks",
-                     None if a.no_overlays else run_dir / "overlays", model_dtype)
+                     None if a.no_overlays else run_dir / "overlays", model_dtype,
+                     a.flow_threshold, a.cellprob_threshold)
     write_csv(run_dir / "per_image.csv", rows, PER_IMAGE_FIELDS)
     config["model_dtype"] = model_dtype
     if run is not None:
