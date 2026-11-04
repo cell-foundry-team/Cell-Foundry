@@ -14,8 +14,9 @@ Baseline settings = Cellpose defaults (checked in train.py of 4.2.1.1):
     saved weights are float32.
     One "epoch" = one random 384 x 384 crop from EACH training image (18 crops).
     cpsam / cpsam_v2 (Cellpose-SAM, ViT-L) also work via --base-model; they train on 256 x 256
-    tiles (Cellpose requires it), picked automatically. Not yet run on our data; ViT-L is larger
-    than ViT-B, so do the 2-epoch memory test first on an 8 GB GPU.
+    tiles (Cellpose requires it), picked automatically. Run on a 32 GB V100 (CAIRO): about 8.5 GB
+    peak and about 10 min for 100 epochs on a free GPU. Not tested on an 8 GB laptop GPU, so do
+    the 2-epoch memory test first there.
 Changed on purpose:
     --min-train-masks 0 (Cellpose default 5 would silently DROP images with < 5 cells,
     i.e. our training control image, which is what teaches "no fat here").
