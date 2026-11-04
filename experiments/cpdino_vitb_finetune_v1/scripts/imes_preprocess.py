@@ -72,6 +72,26 @@ def imes_clahe(image: np.ndarray) -> np.ndarray:
     return np.stack(out, axis=-1)
 
 
+def grey_clahe(image: np.ndarray) -> np.ndarray:
+    """DINOCell's OWN preprocessing recipe (not IMES's): convert to grey FIRST, run CLAHE ONCE
+    on the grey channel, then repeat back to 3 channels -- as opposed to imes_clahe() above,
+    which runs CLAHE on R, G, B separately and never converts to grey. Same clip limit and tile
+    grid, so the per-channel-vs-grey-first choice is the only thing that differs between the two.
+
+    Untested against real training results as of writing (P1 in Test_Plan_Preprocessing.md,
+    local-only/ -- not part of this repo). Added here so both the DINOCell and cpdino-vitb
+    fine-tuning scripts can select it via --preprocess grey_clahe.
+    """
+    import cv2
+
+    rgb = to_three_channels(image)
+    grey = rgb.astype(np.float32).mean(axis=-1)                      # H x W, average of R/G/B
+    clahe = cv2.createCLAHE(clipLimit=CLAHE_CLIP_LIMIT, tileGridSize=CLAHE_TILE_GRID)
+    enhanced = clahe.apply(stretch_to_uint8(grey))
+    enhanced = cv2.normalize(enhanced, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+    return np.repeat(enhanced[..., None], 3, axis=-1)
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--image", type=Path, required=True, help="one *_image.* file")
