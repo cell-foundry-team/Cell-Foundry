@@ -32,7 +32,7 @@ SPLIT="$REPO/splits/porcine_bf_v1.json"
 
 BASE=cpdino
 P=cpdino-ft                                  # label prefix, e.g. cpdino-ft-raw-v1-s0
-SEEDS=(0 1 2)
+read -r -a SEEDS <<< "${SEEDS:-0 1 2}"          # e.g. SEEDS="0" for a single seed (protocol: 3)
 SETTINGS=("none:raw" "imes_clahe:clahe")     # preprocess:tag
 TIE_GOES_TO="${TIE_GOES_TO:-$P-clahe-v1}"    # as in the cpdino-vitb protocol
 
