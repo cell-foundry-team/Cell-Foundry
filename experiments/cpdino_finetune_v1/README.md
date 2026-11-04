@@ -29,11 +29,16 @@ examples changed from cpdino-vitb to cpdino. The split (`splits/porcine_bf_v1.js
 
 ## 0. Get the data to the server
 
-The image data is **not** in git. Your copy is
-`/Users/prethebhaneelaveni/Documents/porcine_data/Training_porcine_bf` (56 files = 28 image/mask pairs, ~114 MB):
+The image data is **not** in git. Use the verified local copy
+`/Users/prethebhaneelaveni/porcine_data_local/Training_porcine_bf` (56 files = 28 image/mask pairs, ~114 MB).
+Do **not** copy from a folder inside `Documents`: iCloud can evict files there, and an evicted file is copied as an
+empty file (three images were unreadable that way). Check first, then copy:
 
 ```bash
-scp -r "$HOME/Documents/porcine_data/Training_porcine_bf" <user>@<cairo-host>:~/
+cd ~/porcine_data_local/Training_porcine_bf
+for f in *; do [ "$(head -c 1000 "$f" | wc -c)" -ge 100 ] || echo "UNREADABLE: $f"; done   # must print nothing
+scp -r ~/porcine_data_local/Training_porcine_bf <user>@<cairo-host>:~/
+ssh <user>@<cairo-host> 'ls ~/Training_porcine_bf | wc -l'                                   # must print 56
 ```
 
 The folder must keep the name `Training_porcine_bf`; the scripts refuse any other name.
