@@ -1,0 +1,7 @@
+model,condition,n_images,n_scored,fat_pct_true_mean,fat_pct_pred_mean,fat_pct_error_mean,fat_pct_error_std,fat_pct_abs_error_mean,fat_pct_abs_error_max,fg_dice_mean,fg_dice_std,n_true_total,n_pred_total,pooled_count_error,abs_count_error_median,F1@0.5_mean,F1@0.5_std,pooled_F1@0.5,F1@0.7_mean,F1@0.75_mean
+cpdino-raw,differentiated,5,5,19.36,18.83,-0.53,4.65,3.72,6.08,0.737,0.084,1815,2517,0.387,0.075,0.562,0.255,0.516,0.408,0.334
+cpdino-raw,control,1,1,0.08,1.25,1.17,0.0,1.17,1.17,0.116,0.0,2,59,28.5,28.5,0.066,0.0,0.066,0.066,0.066
+cpdino-raw,all,6,6,16.14,15.9,-0.24,4.22,3.3,6.08,0.634,0.265,1817,2576,0.418,0.479,0.48,0.305,0.509,0.351,0.289
+cpdino-ft-clahe-v1-s0,differentiated,5,5,19.36,20.45,1.09,2.12,2.13,2.59,0.853,0.017,1815,1731,-0.046,0.029,0.793,0.054,0.794,0.613,0.529
+cpdino-ft-clahe-v1-s0,control,1,1,0.08,0.08,0.0,0.0,0.0,0.0,0.388,0.0,2,3,0.5,0.5,0.4,0.0,0.4,0.4,0.0
+cpdino-ft-clahe-v1-s0,all,6,6,16.14,17.05,0.91,1.94,1.77,2.59,0.776,0.19,1817,1734,-0.046,0.071,0.728,0.168,0.794,0.578,0.441
