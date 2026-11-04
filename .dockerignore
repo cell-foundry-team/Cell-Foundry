@@ -1,0 +1,10 @@
+.venv
+**/.venv
+.git
+**/__pycache__
+*.tif
+*.tiff
+*.npy
+*.pt
+Training_porcine_bf
+wandb
