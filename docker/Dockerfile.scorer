@@ -1,0 +1,14 @@
+# Image for the scoring script only (scripts/score_masks_v2.py and its tests).
+# CPU only, no models, no data inside the image: mount data at run time with -v.
+FROM python:3.12-slim
+
+WORKDIR /app
+# score_masks_v2.score() imports cellpose.metrics, so cellpose is needed (same version as cellpose-env).
+# CPU-only torch first, so pip does not pull the multi-GB CUDA build for a script that never uses the GPU.
+RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu \
+ && pip install --no-cache-dir "cellpose==4.2.1.1" "numpy>=2.5.4" "scikit-image>=0.26.0" "tifffile>=2026.9.20"
+
+COPY scripts/score_masks_v2.py scripts/test_score_masks_v2.py ./scripts/
+
+# default: run the scorer's own hand-computed checks (a plain script that prints OK / BAD)
+CMD ["python", "scripts/test_score_masks_v2.py"]
