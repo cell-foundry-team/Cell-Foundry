@@ -4,6 +4,19 @@ Goal: repeat exactly what Priyam did for **cpdino-vitb** (`experiments/cpdino_vi
 **cpdino** (the larger ViT-L DINOv3 backbone). Same split, same scripts, same settings; only `--base-model cpdino`
 differs. Everything is driven by one script, `run_cpdino_pipeline.sh`, in this folder.
 
+| Path | Content |
+|---|---|
+| `run_cpdino_pipeline.sh` | One command per stage: check, memtest, train, predict-val, score-val, test |
+| `scripts/finetune_cpdino.py` | Priyam's fine-tuning script; default `--base-model cpdino` (ViT-L) |
+| `scripts/predict_split.py` | Predicts one subset with a built-in or fine-tuned model, shared mask format |
+| `scripts/split_io.py` | Split loading + fingerprint check, safe model loading, `save_mask` |
+| `scripts/imes_preprocess.py` | IMES per-channel CLAHE (`--preprocess imes_clahe`) |
+| `scripts/summarise_seeds.py` | Mean ± SD over seeds, pre-set decision rule (defaults name the cpdino settings) |
+
+`scripts/` are copies of `experiments/cpdino_vitb_finetune_v1/scripts/` with the same logic; only defaults and
+examples changed from cpdino-vitb to cpdino. The split (`splits/porcine_bf_v1.json`) and the scorer
+(`scripts/score_masks_v2.py` at the repo root) are the shared ones.
+
 ## Rules (from `PROTOCOL_porcine_bf_v1.md`; they keep the numbers comparable with cpdino-vitb)
 
 1. Train only on the 18 train images; never edit `splits/porcine_bf_v1.json` (fingerprint `22d6fd1c60e2`).
@@ -32,7 +45,7 @@ Needs Linux with an NVIDIA GPU and driver, `git`, and [uv](https://docs.astral.s
 ```bash
 git clone https://github.com/cell-foundry-team/Cell-Foundry.git     # or: cd Cell-Foundry && git fetch
 cd Cell-Foundry
-git checkout prethebha/cpdino-finetune        # this branch has the script; or use main once it is merged
+git checkout cpdino-prethebha                 # this branch has the scripts; or use main once it is merged
 (cd cellpose-env && uv sync)                  # cellpose 4.2.1.1, torch 2.14.1, dinov3 (downloads a few GB)
 
 export DATA=~/Training_porcine_bf             # the image folder you copied
@@ -46,8 +59,8 @@ inside the new tmux session. Re-running a stage is safe: finished trainings and 
 is ever overwritten.
 
 If Cairo is a **Windows** machine, use Priyam's PowerShell commands in
-`experiments/cpdino_vitb_finetune_v1/README.md` (steps 5-11) and just add `--base-model cpdino` to every
-`finetune_cpdino.py` call and use `--model cpdino` for zero-shot predictions; the bash script will not run there.
+`experiments/cpdino_vitb_finetune_v1/README.md` (steps 5-11), but call the scripts in this folder's `scripts/`
+(default `--base-model cpdino`) and use `--model cpdino` for zero-shot predictions; the bash script will not run there.
 
 ## 2. Run, in this order
 
@@ -101,7 +114,7 @@ Dice 0.68 → 0.84, F1@0.7 0.38 → 0.60. Do not assume cpdino gives the same re
 ## 5. The same steps without the script (what it runs for each step)
 
 ```bash
-CP=cellpose-env; EXP=experiments/cpdino_vitb_finetune_v1; SPLIT=splits/porcine_bf_v1.json
+CP=cellpose-env; EXP=experiments/cpdino_finetune_v1; SPLIT=splits/porcine_bf_v1.json
 # train one model (preprocess none|imes_clahe, seed 0|1|2)
 uv run --project $CP python $EXP/scripts/finetune_cpdino.py --split-file $SPLIT --group-dir $DATA --out-root $OUT \
     --base-model cpdino --preprocess none --seed 0 --label cpdino-ft-raw-v1-s0

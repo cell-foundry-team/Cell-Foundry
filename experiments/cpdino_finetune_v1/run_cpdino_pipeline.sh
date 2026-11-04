@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Fine-tune cpdino (ViT-L DINOv3) on split porcine_bf_v1, the same way cpdino-vitb was done
-# (experiments/cpdino_vitb_finetune_v1/README.md, steps 3-11). Uses that folder's scripts unchanged.
+# (experiments/cpdino_vitb_finetune_v1/README.md, steps 3-11) with this folder's scripts/, which are
+# Priyam's cpdino-vitb scripts with cpdino defaults.
 #
 # Needs a Linux/CUDA machine for the train/predict stages (finetune_cpdino.py stops without CUDA).
 # `check` also runs on a Mac (no GPU needed).
@@ -22,7 +23,7 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-EXP="$REPO/experiments/cpdino_vitb_finetune_v1"
+EXP="$REPO/experiments/cpdino_finetune_v1"
 CP="$REPO/cellpose-env"
 SPLIT="$REPO/splits/porcine_bf_v1.json"
 
