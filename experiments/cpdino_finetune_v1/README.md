@@ -17,6 +17,72 @@ differs. Everything is driven by one script, `run_cpdino_pipeline.sh`, in this f
 examples changed from cpdino-vitb to cpdino. The split (`splits/porcine_bf_v1.json`) and the scorer
 (`scripts/score_masks_v2.py` at the repo root) are the shared ones.
 
+## Complete the 3-seed run on Cairo (everything, in order)
+
+Already done on 2026-11-04 (seed 0 only): raw and CLAHE trained, scored on val, test run once for zero-shot and CLAHE
+seed 0. Missing for the protocol: seeds 1 and 2 of **both** settings (4 runs). Needs the V100 for about **2-3 hours**
+(4 x 23-35 min training, ~6 min prediction, ~6 min test). Ask Pavin for the block first; his cpsam jobs share the GPU
+(~8.7 GB) and slow yours down.
+
+**Decide this before looking at any number (pre-set plan):**
+- Setting for the test = the winner of the same rule as before, applied to the **3-seed val means**: lower
+  |fat % error| on the differentiated val images wins; a difference < 0.5 pp is a tie and goes to CLAHE.
+- The test set was already evaluated once for zero-shot and CLAHE seed 0 (2026-11-04), before the extra seeds. Say so in
+  the report. If the rule picks raw, the raw test numbers (3 seeds) are reported next to the CLAHE seed-0 numbers; the
+  test is never used to choose.
+
+```bash
+# 0) connect, then update YOUR clone (the branch was rewritten; do not touch ~/Cell-Foundry, it is Pavin's)
+ssh cellfoundry@10.10.33.20
+cd ~/Cell-Foundry-cpdino
+git fetch origin && git reset --hard origin/cpdino-prethebha     # safe: results/weights live in ~/results, venv is untracked
+nvidia-smi --query-gpu=memory.used,memory.total --format=csv      # who is on the GPU? (ask Pavin if > 9 GB used)
+
+# 1) shell setup (repeat after every new login / inside tmux)
+tmux new -s cpdino                 # or: tmux attach -t cpdino
+export DATA=~/Training_porcine_bf OUT=~/results/cpdino_ft UV_NO_SYNC=1
+S=./experiments/cpdino_finetune_v1/run_cpdino_pipeline.sh; chmod +x $S
+$S check                           # must say: torch 2.14.1+cu126 | cuda True | GPU Tesla V100... | fingerprint 22d6fd1c60e2
+ls $DATA | wc -l                   # must print 56
+```
+If `check` says `cuda False` (the venv was recreated and has the cu130 torch again), reinstall the cu126 build:
+`cd cellpose-env && uv pip install --python .venv/bin/python --reinstall-package torch --reinstall-package torchvision
+torch==2.14.1 torchvision==0.29.1 --index-url https://download.pytorch.org/whl/cu126 --extra-index-url
+https://pypi.org/simple --index-strategy unsafe-best-match && cd ..`
+
+```bash
+# 2) train seeds 1 and 2 (seed 0 exists and is skipped), predict val, score val. One command, ~1.5-2.5 h:
+$S val-all > ~/val_all.log 2>&1; echo "exit $?"
+tr '\r' '\n' < ~/val_all.log | tail -45        # seed table + "PRE-SET RULE ... CHOSEN: ..." + paired comparison
+```
+Do not press keys in the window while it runs (a stray Ctrl-C earlier interrupted a prediction). Detach with Ctrl-b d.
+If it is interrupted, just run the same command again: finished runs are skipped, partial ones are redone.
+Expected: 6 trained models in `ls $OUT/train` (`cpdino-ft-{raw,clahe}-v1-s{0,1,2}`), `score-val` prints mean +/- SD over 3 seeds.
+
+```bash
+# 3) test, once, with the setting chosen by the rule (none = raw, imes_clahe = CLAHE). ~6 min:
+FINAL=imes_clahe CONFIRM_TEST=yes $S test > ~/test3.log 2>&1; echo "exit $?"
+tr '\r' '\n' < ~/test3.log | tail -40
+```
+Zero-shot and already-predicted seeds are skipped, so only the missing seeds of the chosen setting run.
+
+```bash
+# 4) bring the results to the Mac (scp/rsync fail on Cairo: the login prints junk). On the server:
+cd ~ && tar czf - results/cpdino_ft/rescore val_all.log test3.log \
+  $(find results/cpdino_ft/train -name train_config.json -o -name losses.csv -o -name train.log) | base64 -w0; echo
+# triple-click the long line, copy it. On the Mac (check it starts with H4sI):
+pbpaste | base64 -D > ~/cpdino_results/cpdino_results3.tgz && tar xzf ~/cpdino_results/cpdino_results3.tgz -C ~/cpdino_results
+```
+
+**5) Finish the report (on the Mac, in `~/cellfoundry_push`, branch `cpdino-prethebha`):** copy the newest val and test
+`rescore/*/summary.csv`, `per_image.csv`, `seeds_summary.csv` into `Results/cpdino_finetune_v1/` as `val3_*` / `test3_*`,
+update `Results/cpdino_finetune_v1/README.md` with the 3-seed mean +/- SD tables, the rule outcome and the test
+disclosure above, then commit and push (PR #42 updates itself). Remove the "one seed" caveat only after the 3-seed
+numbers are in.
+
+**Not to do:** do not run `test` before `score-val` has chosen the setting; do not run `test` twice; do not change
+the split, epochs, learning rate or crop size (it would break the comparison with cpdino-vitb).
+
 ## Rules (from `PROTOCOL_porcine_bf_v1.md`; they keep the numbers comparable with cpdino-vitb)
 
 1. Train only on the 18 train images; never edit `splits/porcine_bf_v1.json` (fingerprint `22d6fd1c60e2`).

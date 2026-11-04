@@ -13,6 +13,7 @@
 #   ./run_cpdino_pipeline.sh train               # raw + CLAHE x seeds 0,1,2 (6 runs); skips finished ones
 #   ./run_cpdino_pipeline.sh predict-val         # zero-shot reference + the 6 fine-tuned models on val
 #   ./run_cpdino_pipeline.sh score-val           # score val, seed table, pre-set decision rule
+#   ./run_cpdino_pipeline.sh val-all             # train + predict-val + score-val in one go (3 seeds by default)
 #   # --- decide, then touch the test set exactly once ---
 #   FINAL=none|imes_clahe CONFIRM_TEST=yes ./run_cpdino_pipeline.sh test
 #
@@ -35,11 +36,19 @@ P=cpdino-ft                                  # label prefix, e.g. cpdino-ft-raw-
 read -r -a SEEDS <<< "${SEEDS:-0 1 2}"          # e.g. SEEDS="0" for a single seed (protocol: 3)
 SETTINGS=("none:raw" "imes_clahe:clahe")     # preprocess:tag
 TIE_GOES_TO="${TIE_GOES_TO:-$P-clahe-v1}"    # as in the cpdino-vitb protocol
+export UV_NO_SYNC="${UV_NO_SYNC:-1}"          # keep the hand-installed cu126 torch (uv run must not re-sync to cu130)
 
 py() { uv run --project "$CP" python "$@"; }
 latest() { ls -d "$1"/*/ 2>/dev/null | sort | tail -1; }
-train_dir() { ls -d "$OUT"/train/*_"$1" 2>/dev/null | head -1 || true; }
-has_predict() { compgen -G "$OUT/predict/*_$1_$2" >/dev/null; }
+# a run counts as done only if its weights file exists / its masks folder is non-empty (partial runs are redone)
+train_dir() { local d; for d in "$OUT"/train/*_"$1"; do [ -f "$d/models/$1" ] && { echo "$d"; return 0; }; done; return 0; }
+has_predict() {
+    local d
+    for d in "$OUT"/predict/*_"$1"_"$2"; do
+        [ -d "$d/masks/$2" ] && [ -n "$(ls -A "$d/masks/$2" 2>/dev/null)" ] && return 0
+    done
+    return 1
+}
 
 predict() {   # predict <subset> <model> <preprocess> <label> [extra args]
     local subset=$1 model=$2 pre=$3 label=$4; shift 4
@@ -105,6 +114,13 @@ stage_score_val() {
         --compare "$P-raw-v1" "$P-clahe-v1" --tie-goes-to "$TIE_GOES_TO"
 }
 
+stage_val_all() {   # train + predict-val + score-val for every seed in $SEEDS (default 0 1 2)
+    nvidia-smi --query-gpu=memory.used,memory.total --format=csv || true
+    stage_train
+    stage_predict_val
+    stage_score_val
+}
+
 stage_test() {
     [ "${CONFIRM_TEST:-}" = "yes" ] || { echo "Test set is used once. Set CONFIRM_TEST=yes to proceed."; exit 1; }
     case "${FINAL:-}" in
@@ -132,6 +148,7 @@ case "${1:-}" in
     train) stage_train ;;
     predict-val) stage_predict_val ;;
     score-val) stage_score_val ;;
+    val-all) stage_val_all ;;
     test) stage_test ;;
     *) sed -n '2,22p' "$0"; exit 1 ;;
 esac
