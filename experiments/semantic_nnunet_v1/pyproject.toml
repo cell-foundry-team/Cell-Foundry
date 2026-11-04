@@ -1,0 +1,26 @@
+[project]
+name = "semantic-nnunet-v1"
+version = "0.1.0"
+description = "Separate environment for the nnU-Net semantic (fat / not fat) baseline, kept apart from the main env (dinocell pins torch 2.10.0) and cellpose-env (cellpose 4.2.1.1), same reason cellpose-env exists."
+requires-python = ">=3.12"
+dependencies = [
+    "nnunetv2==2.8.1",
+    "torch==2.14.1",
+    "torchvision==0.29.1",
+    "numpy",
+    "scikit-image",
+    "tifffile",
+    "imageio",
+    "opencv-python-headless",
+]
+
+[tool.uv.sources]
+# Same Windows fix as cellpose-env/pyproject.toml: PyPI only ships CPU-only torch wheels on
+# Windows, so without this uv silently installs a CPU torch there.
+torch = [{ index = "pytorch-cu132", marker = "sys_platform == 'win32'" }]
+torchvision = [{ index = "pytorch-cu132", marker = "sys_platform == 'win32'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cu132"
+url = "https://download.pytorch.org/whl/cu132"
+explicit = true
