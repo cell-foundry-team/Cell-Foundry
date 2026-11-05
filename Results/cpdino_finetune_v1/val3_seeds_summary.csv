@@ -1,0 +1,25 @@
+setting,condition,metric,seeds,n_seeds,mean,sd,min,max
+cpdino-raw,differentiated,fat_pct_error_mean,0,1,-3.51,nan,-3.51,-3.51
+cpdino-raw,differentiated,fat_pct_abs_error_mean,0,1,4.51,nan,4.51,4.51
+cpdino-raw,differentiated,fg_dice_mean,0,1,0.758,nan,0.758,0.758
+cpdino-raw,differentiated,pooled_count_error,0,1,1.846,nan,1.846,1.846
+cpdino-raw,differentiated,F1@0.5_mean,0,1,0.536,nan,0.536,0.536
+cpdino-raw,differentiated,F1@0.7_mean,0,1,0.407,nan,0.407,0.407
+cpdino-ft-raw-v1,differentiated,fat_pct_error_mean,0 1 2,3,-1.1933,0.1172,-1.28,-1.06
+cpdino-ft-raw-v1,differentiated,fat_pct_abs_error_mean,0 1 2,3,2.0733,0.1528,1.94,2.24
+cpdino-ft-raw-v1,differentiated,fg_dice_mean,0 1 2,3,0.8783,0.0015,0.877,0.88
+cpdino-ft-raw-v1,differentiated,pooled_count_error,0 1 2,3,-0.058,0.0104,-0.07,-0.051
+cpdino-ft-raw-v1,differentiated,F1@0.5_mean,0 1 2,3,0.823,0.0017,0.822,0.825
+cpdino-ft-raw-v1,differentiated,F1@0.7_mean,0 1 2,3,0.6633,0.0075,0.656,0.671
+cpdino-ft-clahe-v1,differentiated,fat_pct_error_mean,0 1 2,3,-1.1733,0.215,-1.39,-0.96
+cpdino-ft-clahe-v1,differentiated,fat_pct_abs_error_mean,0 1 2,3,2.1733,0.2303,1.95,2.41
+cpdino-ft-clahe-v1,differentiated,fg_dice_mean,0 1 2,3,0.8777,0.0021,0.876,0.88
+cpdino-ft-clahe-v1,differentiated,pooled_count_error,0 1 2,3,-0.0623,0.0051,-0.068,-0.058
+cpdino-ft-clahe-v1,differentiated,F1@0.5_mean,0 1 2,3,0.8187,0.0055,0.815,0.825
+cpdino-ft-clahe-v1,differentiated,F1@0.7_mean,0 1 2,3,0.6617,0.0085,0.653,0.67
+cpdino-raw,control,fat_pct_error_mean,0,1,1.39,nan,1.39,1.39
+cpdino-raw,control,n_pred_total,0,1,88.0,nan,88.0,88.0
+cpdino-ft-raw-v1,control,fat_pct_error_mean,0 1 2,3,-0.0867,0.1617,-0.26,0.06
+cpdino-ft-raw-v1,control,n_pred_total,0 1 2,3,7.6667,6.5064,1.0,14.0
+cpdino-ft-clahe-v1,control,fat_pct_error_mean,0 1 2,3,-0.15,0.1353,-0.28,-0.01
+cpdino-ft-clahe-v1,control,n_pred_total,0 1 2,3,8.6667,5.0332,4.0,14.0
