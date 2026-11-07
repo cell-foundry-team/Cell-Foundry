@@ -36,12 +36,12 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from imes_preprocess import imes_clahe  # noqa: E402
+from imes_preprocess import grey_clahe, imes_clahe  # noqa: E402
 from split_io import (  # noqa: E402
     SUBSETS, check_label, find_image, load_cellpose, load_split, sha256_file, versions,
 )
 
-PREPROCESS = {"none": lambda img: img, "imes_clahe": imes_clahe}
+PREPROCESS = {"none": lambda img: img, "imes_clahe": imes_clahe, "grey_clahe": grey_clahe}
 
 
 def main(argv: list[str] | None = None) -> int:
