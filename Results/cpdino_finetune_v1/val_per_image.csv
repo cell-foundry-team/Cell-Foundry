@@ -1,0 +1,13 @@
+model,source_run,image,series,condition,fat_pct_true,fat_pct_pred,fat_pct_error,fat_pct_abs_error,fg_dice,n_true,n_pred,count_diff,count_error,TP@0.5,FP@0.5,FN@0.5,precision@0.5,recall@0.5,F1@0.5,F1@0.7,F1@0.75,F1@0.9
+cpdino-raw,20261104-131723_val_cpdino-raw,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,1.706,1.391,1.391,0.0,5,88,83,16.6,0,88,5,0.0,0.0,0.0,0.0,0.0,0.0
+cpdino-raw,20261104-131723_val_cpdino-raw,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,23.297,-2.237,2.237,0.835,295,284,-11,-0.037,229,55,66,0.806,0.776,0.791,0.674,0.608,0.086
+cpdino-raw,20261104-131723_val_cpdino-raw,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,17.459,1.51,1.51,0.823,284,283,-1,-0.004,213,70,71,0.753,0.75,0.751,0.511,0.423,0.021
+cpdino-raw,20261104-131723_val_cpdino-raw,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,16.204,-9.788,9.788,0.616,394,2202,1808,4.589,84,2118,310,0.038,0.213,0.065,0.036,0.03,0.003
+cpdino-ft-raw-v1-s0,20261104-131814_val_cpdino-ft-raw-v1-s0,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,0.05,-0.265,0.265,0.0,5,1,-4,-0.8,0,1,5,0.0,0.0,0.0,0.0,0.0,0.0
+cpdino-ft-raw-v1-s0,20261104-131814_val_cpdino-ft-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,23.791,-1.742,1.742,0.877,295,291,-4,-0.014,249,42,46,0.856,0.844,0.85,0.734,0.669,0.106
+cpdino-ft-raw-v1-s0,20261104-131814_val_cpdino-ft-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,17.263,1.314,1.314,0.888,284,277,-7,-0.025,230,47,54,0.83,0.81,0.82,0.684,0.631,0.168
+cpdino-ft-raw-v1-s0,20261104-131814_val_cpdino-ft-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,23.236,-2.756,2.756,0.876,394,337,-57,-0.145,291,46,103,0.864,0.739,0.796,0.594,0.528,0.145
+cpdino-ft-clahe-v1-s0,20261104-134606_val_cpdino-ft-clahe-v1-s0,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,0.041,-0.275,0.275,0.0,5,4,-1,-0.2,0,4,5,0.0,0.0,0.0,0.0,0.0,0.0
+cpdino-ft-clahe-v1-s0,20261104-134606_val_cpdino-ft-clahe-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,24.161,-1.372,1.372,0.882,295,295,0,0.0,249,46,46,0.844,0.844,0.844,0.732,0.668,0.102
+cpdino-ft-clahe-v1-s0,20261104-134606_val_cpdino-ft-clahe-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,17.444,1.495,1.495,0.883,284,280,-4,-0.014,231,49,53,0.825,0.813,0.819,0.67,0.624,0.152
+cpdino-ft-clahe-v1-s0,20261104-134606_val_cpdino-ft-clahe-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,23.0,-2.992,2.992,0.876,394,332,-62,-0.157,285,47,109,0.858,0.723,0.785,0.584,0.518,0.127

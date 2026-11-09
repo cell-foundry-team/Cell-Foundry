@@ -1,0 +1,13 @@
+image,label,n_pred,n_agree,n_extra,n_gt,n_missed
+CLD-AIM-04 PIG 10x Training Positiv_12,cpdino-raw,362,316,46,347,44
+CLD-AIM-04 PIG 10x Training Positiv_12,cpdino-ft-clahe-v1-s0,357,333,24,347,22
+CLD-AIM-04 PIG 10x Training Positiv_13,cpdino-raw,340,311,29,365,57
+CLD-AIM-04 PIG 10x Training Positiv_13,cpdino-ft-clahe-v1-s0,368,346,22,365,21
+CLD-AIM-04 PIG 10x Training Positiv_23,cpdino-raw,753,540,213,384,105
+CLD-AIM-04 PIG 10x Training Positiv_23,cpdino-ft-clahe-v1-s0,332,315,17,384,45
+CLD-AIM-04 PIG 10x Training Positiv_26,cpdino-raw,674,434,240,358,138
+CLD-AIM-04 PIG 10x Training Positiv_26,cpdino-ft-clahe-v1-s0,318,305,13,358,40
+PAD11a_B1_10x_Diff,cpdino-raw,388,334,54,361,34
+PAD11a_B1_10x_Diff,cpdino-ft-clahe-v1-s0,356,324,32,361,31
+PAD11c_D5_10x_Ctrl,cpdino-raw,59,2,57,2,0
+PAD11c_D5_10x_Ctrl,cpdino-ft-clahe-v1-s0,3,1,2,2,1
