@@ -308,14 +308,14 @@ def patch_tensors(sample, device, config: Config, *, augment=False, gamma=None, 
     return image, targets, applied
 
 
-# --------------------------------------------------------------------------- loss / metrics (ported unchanged)
+# --------------------------------------------------------------------------- loss / metrics (ported; background BCE term fixed on 5 Nov: was log(2-p), must be log(1-p) as in IMES's notebook)
 def segmentation_loss(predictions, targets, config: Config):
     flow_dx, flow_dy, probability = [p.float() for p in predictions]
     truth = targets[:, 2]
     probability = probability.clamp(1e-6, 1 - 1e-6)
     foreground = truth.sum()
     positive_weight = ((truth.numel() - foreground) / foreground.clamp_min(1)).clamp(1, config.positive_weight_cap)
-    loss_bce = -(positive_weight * truth * probability.log() + (1 - truth) * (1 - probability).log1p().neg()).mean()
+    loss_bce = -(positive_weight * truth * probability.log() + (1 - truth) * (-probability).log1p()).mean()
     loss_dice = 1 - (2 * (probability * truth).sum() + 1) / (probability.sum() + truth.sum() + 1)
     weights = targets.new_full(truth.shape, 0.05)
     weights[truth > 0.5] = 1.0

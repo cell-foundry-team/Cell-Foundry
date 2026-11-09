@@ -32,6 +32,10 @@ Then score (cellpose-env has the scorer's dependencies):
     uv run --project <repo>/cellpose-env python <repo>/scripts/score_masks_v2.py \\
         --batch-dirs <run folder> --group-dir <data>/Training_porcine_bf
 
+Longer arrow reach (P4; mentor's 22 Oct follow-up): same weights, add --niter 500 (default 250 = what
+dinocell hard-codes, ~40 px). Use a new label such as dinocell-ft-raw-v1-s0-niter500. Prediction only,
+no retraining. Check overlays near touching cells: a longer reach can walk into a neighbour's centre.
+
 NOT YET RUN on a real model. --subset test needs --confirm-test (test is used once, at the end).
 
 Zero-shot base model, val:
@@ -107,6 +111,19 @@ def external_flows(pipeline, image: np.ndarray, device):
     return [helper.combine_crops_v2((h, w), preds[:, i], regions) for i in range(preds.shape[1])]
 
 
+def cells_from_flows_niter(flows_x, flows_y, cell_prob, flow_threshold, cellprob_threshold, niter):
+    """Same call as dinocell's pipeline.cells_from_flows (dinocell 0.74), but with a chosen number of
+    arrow-following steps. dinocell hard-codes niter=250 there; everything else (min_size 15,
+    max_size_fraction 0.4) is copied unchanged, so niter=250 gives the same masks as the original."""
+    import torch
+    from cellpose.dynamics import compute_masks
+
+    dP = np.stack([flows_y, flows_x], axis=0)
+    return compute_masks(dP=dP, cellprob=cell_prob, niter=niter, cellprob_threshold=cellprob_threshold,
+                         flow_threshold=flow_threshold, do_3D=False, min_size=15, max_size_fraction=0.4,
+                         device=torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu"))
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--split-file", type=Path, required=True)
@@ -121,6 +138,9 @@ def main(argv: list[str] | None = None) -> int:
                    help="DINOCell's own grey + per-crop CLAHE (zero-shot base checkpoint only)")
     p.add_argument("--flow-threshold", type=float, default=0.0)
     p.add_argument("--cellprob-threshold", type=float, default=0.5)
+    p.add_argument("--niter", type=int, default=250,
+                   help="arrow-following steps when turning flows into cells (dinocell hard-codes 250; "
+                        "a larger value lets big cells grow to their full size). Prediction-time only.")
     p.add_argument("--note", default="")
     a = p.parse_args(argv)
 
@@ -128,6 +148,8 @@ def main(argv: list[str] | None = None) -> int:
         p.error("--subset test needs --confirm-test (the test set is used ONCE, at the end)")
     if a.native_pipeline and a.preprocess != "none":
         p.error("--native-pipeline applies DINOCell's own preprocessing; combine it only with --preprocess none")
+    if a.niter < 1:
+        p.error("--niter must be at least 1")
     label = check_label(a.label)
     split = load_split(a.split_file)
     if split["group_dir_name"] != a.group_dir.name:
@@ -144,7 +166,7 @@ def main(argv: list[str] | None = None) -> int:
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     mode = "native pipeline (grey + per-crop CLAHE)" if a.native_pipeline else f"external, preprocess {a.preprocess}"
     print(f"split {split['name']} ({split['fingerprint']}) | subset {a.subset} | {len(names)} images | "
-          f"device {device} | {mode} | thresholds flow {a.flow_threshold} cellprob {a.cellprob_threshold}")
+          f"device {device} | {mode} | thresholds flow {a.flow_threshold} cellprob {a.cellprob_threshold} | niter {a.niter}")
     model = build_model(a.weights, device)
     dtype = str(next(model.parameters()).dtype)
     pipeline = get_pipeline("flows", model, device, crop_size=CROP, overlap_size=OVERLAP)
@@ -163,16 +185,14 @@ def main(argv: list[str] | None = None) -> int:
         t0 = time.time()
         if a.native_pipeline:
             labels, preds, _ = pipeline.run(raw, return_raw_preds=True)
-            if (a.flow_threshold, a.cellprob_threshold) != (0.0, 0.5):
-                # non-default thresholds: rebuild the cells from the same raw flows (no 2nd model pass)
-                labels = pipeline.cells_from_flows(preds[0], preds[1], preds[2],
-                                                   flow_threshold=a.flow_threshold,
-                                                   cellprob_threshold=a.cellprob_threshold)
+            if (a.flow_threshold, a.cellprob_threshold, a.niter) != (0.0, 0.5, 250):
+                # non-default thresholds or reach: rebuild the cells from the same raw flows (no 2nd model pass)
+                labels = cells_from_flows_niter(preds[0], preds[1], preds[2], a.flow_threshold,
+                                                a.cellprob_threshold, a.niter)
         else:
             flows = external_flows(pipeline, PREPROCESS[a.preprocess](raw), device)
-            labels = pipeline.cells_from_flows(flows[0], flows[1], flows[2],
-                                               flow_threshold=a.flow_threshold,
-                                               cellprob_threshold=a.cellprob_threshold)
+            labels = cells_from_flows_niter(flows[0], flows[1], flows[2], a.flow_threshold,
+                                            a.cellprob_threshold, a.niter)
         times.append(time.time() - t0)
         labels = np.asarray(labels)
         if labels.shape != raw.shape[:2]:
