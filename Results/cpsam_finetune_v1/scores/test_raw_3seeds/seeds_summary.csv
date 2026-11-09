@@ -1,0 +1,17 @@
+setting,condition,metric,seeds,n_seeds,mean,sd,min,max
+cpsam-ft-raw-v1,differentiated,fat_pct_error_mean,0 1 2,3,1.0,0.6451,0.29,1.55
+cpsam-ft-raw-v1,differentiated,fat_pct_abs_error_mean,0 1 2,3,1.82,0.3635,1.42,2.13
+cpsam-ft-raw-v1,differentiated,fg_dice_mean,0 1 2,3,0.853,0.001,0.852,0.854
+cpsam-ft-raw-v1,differentiated,pooled_count_error,0 1 2,3,0.0293,0.0102,0.022,0.041
+cpsam-ft-raw-v1,differentiated,F1@0.5_mean,0 1 2,3,0.8027,0.0025,0.8,0.805
+cpsam-ft-raw-v1,differentiated,F1@0.7_mean,0 1 2,3,0.6267,0.005,0.622,0.632
+cpsam-raw,differentiated,fat_pct_error_mean,0,1,-6.32,nan,-6.32,-6.32
+cpsam-raw,differentiated,fat_pct_abs_error_mean,0,1,6.32,nan,6.32,6.32
+cpsam-raw,differentiated,fg_dice_mean,0,1,0.573,nan,0.573,0.573
+cpsam-raw,differentiated,pooled_count_error,0,1,1.272,nan,1.272,1.272
+cpsam-raw,differentiated,F1@0.5_mean,0,1,0.368,nan,0.368,0.368
+cpsam-raw,differentiated,F1@0.7_mean,0,1,0.258,nan,0.258,0.258
+cpsam-ft-raw-v1,control,fat_pct_error_mean,0 1 2,3,0.0133,0.0153,0.0,0.03
+cpsam-ft-raw-v1,control,n_pred_total,0 1 2,3,2.3333,0.5774,2.0,3.0
+cpsam-raw,control,fat_pct_error_mean,0,1,0.96,nan,0.96,0.96
+cpsam-raw,control,n_pred_total,0,1,57.0,nan,57.0,57.0

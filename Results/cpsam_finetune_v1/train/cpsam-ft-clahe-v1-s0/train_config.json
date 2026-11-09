@@ -1,0 +1,102 @@
+{
+  "args": {
+    "split_file": "/home/cellfoundry/Cell-Foundry-training/splits/porcine_bf_v1.json",
+    "group_dir": "/home/cellfoundry/Training_porcine_bf",
+    "out_root": "/home/cellfoundry/cellfoundry_results/cpsam",
+    "label": "cpsam-ft-clahe-v1-s0",
+    "base_model": "cpsam",
+    "preprocess": "imes_clahe",
+    "n_epochs": "100",
+    "learning_rate": "1e-05",
+    "weight_decay": "0.1",
+    "batch_size": "1",
+    "bsize": "None",
+    "min_train_masks": "0",
+    "save_every": "100",
+    "seed": "0",
+    "note": ""
+  },
+  "split": {
+    "name": "porcine_bf_v1",
+    "fingerprint": "22d6fd1c60e2"
+  },
+  "train_images": [
+    "CLD-AIM-04 PIG 10x Training Positiv_10",
+    "CLD-AIM-04 PIG 10x Training Positiv_11",
+    "CLD-AIM-04 PIG 10x Training Positiv_14",
+    "CLD-AIM-04 PIG 10x Training Positiv_15",
+    "CLD-AIM-04 PIG 10x Training Positiv_17",
+    "CLD-AIM-04 PIG 10x Training Positiv_18",
+    "CLD-AIM-04 PIG 10x Training Positiv_21",
+    "CLD-AIM-04 PIG 10x Training Positiv_24",
+    "CLD-AIM-04 PIG 10x Training Positiv_25",
+    "CLD-AIM-04 PIG 10x Training Positiv_27",
+    "CLD-AIM-04 PIG 10x Training Positiv_28",
+    "CLD-AIM-04 PIG 10x Training Positiv_29",
+    "CLD-AIM-04 PIG 10x Training Positiv_30",
+    "CLD-AIM-04 PIG 10x Training Positiv_7",
+    "CLD-AIM-04 PIG 10x Training Positiv_8",
+    "CLD-AIM-04 PIG 10x Training Positiv_9",
+    "PAD11a_D1_10x_Ctrl",
+    "PAD11c_B5_10x_Diff"
+  ],
+  "val_images": [
+    "CLD-AIM-04 PIG 10x Training Negativ_2",
+    "CLD-AIM-04 PIG 10x Training Positiv_16",
+    "CLD-AIM-04 PIG 10x Training Positiv_19",
+    "CLD-AIM-04 PIG 10x Training Positiv_22"
+  ],
+  "train_cells": {
+    "CLD-AIM-04 PIG 10x Training Positiv_10": 337,
+    "CLD-AIM-04 PIG 10x Training Positiv_11": 290,
+    "CLD-AIM-04 PIG 10x Training Positiv_14": 320,
+    "CLD-AIM-04 PIG 10x Training Positiv_15": 327,
+    "CLD-AIM-04 PIG 10x Training Positiv_17": 312,
+    "CLD-AIM-04 PIG 10x Training Positiv_18": 283,
+    "CLD-AIM-04 PIG 10x Training Positiv_21": 315,
+    "CLD-AIM-04 PIG 10x Training Positiv_24": 427,
+    "CLD-AIM-04 PIG 10x Training Positiv_25": 317,
+    "CLD-AIM-04 PIG 10x Training Positiv_27": 350,
+    "CLD-AIM-04 PIG 10x Training Positiv_28": 275,
+    "CLD-AIM-04 PIG 10x Training Positiv_29": 285,
+    "CLD-AIM-04 PIG 10x Training Positiv_30": 315,
+    "CLD-AIM-04 PIG 10x Training Positiv_7": 304,
+    "CLD-AIM-04 PIG 10x Training Positiv_8": 427,
+    "CLD-AIM-04 PIG 10x Training Positiv_9": 342,
+    "PAD11a_D1_10x_Ctrl": 5,
+    "PAD11c_B5_10x_Diff": 182
+  },
+  "val_cells": {
+    "CLD-AIM-04 PIG 10x Training Negativ_2": 5,
+    "CLD-AIM-04 PIG 10x Training Positiv_16": 295,
+    "CLD-AIM-04 PIG 10x Training Positiv_19": 284,
+    "CLD-AIM-04 PIG 10x Training Positiv_22": 394
+  },
+  "base_weights": "/home/cellfoundry/.cellpose/models/cpsam",
+  "base_weights_sha256": "e1440429eb384f95afe32bcba6510f90d518eaedc917ede549bed6804004abe2",
+  "backbone": "sam_vitl",
+  "bsize_used": 256,
+  "versions": {
+    "python": "3.12.3",
+    "cellpose": "4.2.1.1",
+    "torch": "2.14.1+cu126",
+    "opencv": "5.0.0",
+    "cuda": "12.6",
+    "gpu": "Tesla V100-PCIE-32GB"
+  },
+  "cellpose_defaults_used": {
+    "optimizer": "AdamW",
+    "scale_range": 0.5,
+    "rescale": false,
+    "normalize": "default (1-99 percentile)"
+  },
+  "numpy_seed_offset": 0,
+  "started": "2026-11-04T13:41:19",
+  "weights_file": "/home/cellfoundry/cellfoundry_results/cpsam/train/20261104-134108_cpsam-ft-clahe-v1-s0/models/cpsam-ft-clahe-v1-s0",
+  "weights_sha256": "5c865dbeb60c40a0dd3c4492ea80979976b65eae6df755f50d1613f97576a052",
+  "train_seconds": 916.0,
+  "seconds_per_epoch": 9.16,
+  "peak_gpu_gb": 8.52,
+  "final_train_loss": 0.4723717201915052,
+  "finished": "2026-11-04T13:56:41"
+}

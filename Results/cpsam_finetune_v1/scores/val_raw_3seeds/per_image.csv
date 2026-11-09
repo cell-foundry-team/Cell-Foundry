@@ -1,0 +1,13 @@
+model,source_run,image,series,condition,fat_pct_true,fat_pct_pred,fat_pct_error,fat_pct_abs_error,fg_dice,n_true,n_pred,count_diff,count_error,TP@0.5,FP@0.5,FN@0.5,precision@0.5,recall@0.5,F1@0.5,F1@0.7,F1@0.75,F1@0.9
+cpsam-ft-raw-v1-s0,20261104-125032_val_cpsam-ft-raw-v1-s0,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,0.149,-0.166,0.166,0.642,5,3,-2,-0.4,3,0,2,1.0,0.6,0.75,0.0,0.0,0.0
+cpsam-ft-raw-v1-s0,20261104-125032_val_cpsam-ft-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,24.715,-0.818,0.818,0.878,295,308,13,0.044,257,51,38,0.834,0.871,0.852,0.733,0.687,0.109
+cpsam-ft-raw-v1-s0,20261104-125032_val_cpsam-ft-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,17.518,1.569,1.569,0.875,284,285,1,0.004,235,50,49,0.825,0.827,0.826,0.65,0.583,0.13
+cpsam-ft-raw-v1-s0,20261104-125032_val_cpsam-ft-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,24.342,-1.65,1.65,0.887,394,353,-41,-0.104,302,51,92,0.856,0.766,0.809,0.624,0.538,0.137
+cpsam-ft-raw-v1-s1,20261104-132953_val_cpsam-ft-raw-v1-s1,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,0.297,-0.018,0.018,0.614,5,6,1,0.2,3,3,2,0.5,0.6,0.545,0.182,0.182,0.0
+cpsam-ft-raw-v1-s1,20261104-132953_val_cpsam-ft-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,23.688,-1.845,1.845,0.876,295,307,12,0.041,259,48,36,0.844,0.878,0.86,0.714,0.668,0.11
+cpsam-ft-raw-v1-s1,20261104-132953_val_cpsam-ft-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,16.85,0.901,0.901,0.883,284,278,-6,-0.021,231,47,53,0.831,0.813,0.822,0.658,0.605,0.157
+cpsam-ft-raw-v1-s1,20261104-132953_val_cpsam-ft-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,22.952,-3.04,3.04,0.873,394,354,-40,-0.102,297,57,97,0.839,0.754,0.794,0.61,0.516,0.134
+cpsam-ft-raw-v1-s2,20261104-134036_val_cpsam-ft-raw-v1-s2,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,0.198,-0.117,0.117,0.622,5,4,-1,-0.2,3,1,2,0.75,0.6,0.667,0.222,0.222,0.0
+cpsam-ft-raw-v1-s2,20261104-134036_val_cpsam-ft-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,24.112,-1.422,1.422,0.876,295,305,10,0.034,254,51,41,0.833,0.861,0.847,0.723,0.673,0.107
+cpsam-ft-raw-v1-s2,20261104-134036_val_cpsam-ft-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,16.863,0.914,0.914,0.879,284,268,-16,-0.056,230,38,54,0.858,0.81,0.833,0.696,0.609,0.145
+cpsam-ft-raw-v1-s2,20261104-134036_val_cpsam-ft-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,23.93,-2.062,2.062,0.881,394,360,-34,-0.086,310,50,84,0.861,0.787,0.822,0.615,0.531,0.125

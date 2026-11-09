@@ -1,0 +1,9 @@
+setting,condition,metric,seeds,n_seeds,mean,sd,min,max
+cpsam-ft-raw-v1,differentiated,fat_pct_error_mean,0 1 2,3,-0.83,0.5157,-1.33,-0.3
+cpsam-ft-raw-v1,differentiated,fat_pct_abs_error_mean,0 1 2,3,1.5833,0.3062,1.35,1.93
+cpsam-ft-raw-v1,differentiated,fg_dice_mean,0 1 2,3,0.8787,0.0015,0.877,0.88
+cpsam-ft-raw-v1,differentiated,pooled_count_error,0 1 2,3,-0.0347,0.0065,-0.041,-0.028
+cpsam-ft-raw-v1,differentiated,F1@0.5_mean,0 1 2,3,0.8293,0.0045,0.825,0.834
+cpsam-ft-raw-v1,differentiated,F1@0.7_mean,0 1 2,3,0.6693,0.0085,0.661,0.678
+cpsam-ft-raw-v1,control,fat_pct_error_mean,0 1 2,3,-0.1033,0.0764,-0.17,-0.02
+cpsam-ft-raw-v1,control,n_pred_total,0 1 2,3,4.3333,1.5275,3.0,6.0
