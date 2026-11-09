@@ -1,0 +1,13 @@
+model,source_run,image,series,condition,fat_pct_true,fat_pct_pred,fat_pct_error,fat_pct_abs_error,fg_dice,n_true,n_pred,count_diff,count_error,TP@0.5,FP@0.5,FN@0.5,precision@0.5,recall@0.5,F1@0.5,F1@0.7,F1@0.75,F1@0.9
+nnunet-2d-raw-v1-s0,20261109-103132_val_nnunet-2d-raw-v1-s0,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,3.214,2.899,2.899,0.135,5,1,-4,-0.8,0,1,5,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s0,20261109-103132_val_nnunet-2d-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,21.471,-4.062,4.062,0.853,295,1,-294,-0.997,0,1,295,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s0,20261109-103132_val_nnunet-2d-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,19.91,3.96,3.96,0.862,284,1,-283,-0.996,0,1,284,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s0,20261109-103132_val_nnunet-2d-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,24.415,-1.577,1.577,0.894,394,1,-393,-0.997,0,1,394,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-104420_val_nnunet-2d-raw-v1-s1,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,2.255,1.94,1.94,0.165,5,1,-4,-0.8,0,1,5,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-104420_val_nnunet-2d-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,22.046,-3.487,3.487,0.859,295,1,-294,-0.997,0,1,295,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-104420_val_nnunet-2d-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,19.896,3.947,3.947,0.865,284,1,-283,-0.996,0,1,284,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-104420_val_nnunet-2d-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,24.762,-1.229,1.229,0.892,394,1,-393,-0.997,0,1,394,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-105709_val_nnunet-2d-raw-v1-s2,CLD-AIM-04 PIG 10x Training Negativ_2,CLD-AIM-04,control,0.315,6.074,5.759,5.759,0.066,5,1,-4,-0.8,0,1,5,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-105709_val_nnunet-2d-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_16,CLD-AIM-04,differentiated,25.533,21.582,-3.952,3.952,0.854,295,1,-294,-0.997,0,1,295,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-105709_val_nnunet-2d-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_19,CLD-AIM-04,differentiated,15.949,20.206,4.256,4.256,0.854,284,1,-283,-0.996,0,1,284,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-105709_val_nnunet-2d-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_22,CLD-AIM-04,differentiated,25.992,24.232,-1.759,1.759,0.885,394,1,-393,-0.997,0,1,394,0.0,0.0,0.0,0.0,0.0,0.0
