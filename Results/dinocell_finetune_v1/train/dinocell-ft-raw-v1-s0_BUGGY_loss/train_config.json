@@ -1,0 +1,78 @@
+{
+  "args": {
+    "split_file": "splits/porcine_bf_v1.json",
+    "group_dir": "/home/cellfoundry/Training_porcine_bf",
+    "out_root": "/home/cellfoundry/cellfoundry_results/dinocell_ft",
+    "label": "dinocell-ft-raw-v1-s0",
+    "weights": ".dinocell_models/DINOCell_demo_model.pt",
+    "preprocess": "none",
+    "steps": "1000",
+    "amp_precision": "fp16",
+    "lora_rank": "8",
+    "lora_last_blocks": "4",
+    "seed": "0",
+    "validate_every": "50"
+  },
+  "split": {
+    "name": "porcine_bf_v1",
+    "fingerprint": "22d6fd1c60e2"
+  },
+  "train_images": [
+    "CLD-AIM-04 PIG 10x Training Positiv_10",
+    "CLD-AIM-04 PIG 10x Training Positiv_11",
+    "CLD-AIM-04 PIG 10x Training Positiv_14",
+    "CLD-AIM-04 PIG 10x Training Positiv_15",
+    "CLD-AIM-04 PIG 10x Training Positiv_17",
+    "CLD-AIM-04 PIG 10x Training Positiv_18",
+    "CLD-AIM-04 PIG 10x Training Positiv_21",
+    "CLD-AIM-04 PIG 10x Training Positiv_24",
+    "CLD-AIM-04 PIG 10x Training Positiv_25",
+    "CLD-AIM-04 PIG 10x Training Positiv_27",
+    "CLD-AIM-04 PIG 10x Training Positiv_28",
+    "CLD-AIM-04 PIG 10x Training Positiv_29",
+    "CLD-AIM-04 PIG 10x Training Positiv_30",
+    "CLD-AIM-04 PIG 10x Training Positiv_7",
+    "CLD-AIM-04 PIG 10x Training Positiv_8",
+    "CLD-AIM-04 PIG 10x Training Positiv_9",
+    "PAD11a_D1_10x_Ctrl",
+    "PAD11c_B5_10x_Diff"
+  ],
+  "val_images": [
+    "CLD-AIM-04 PIG 10x Training Negativ_2",
+    "CLD-AIM-04 PIG 10x Training Positiv_16",
+    "CLD-AIM-04 PIG 10x Training Positiv_19",
+    "CLD-AIM-04 PIG 10x Training Positiv_22"
+  ],
+  "amp_precision": "fp16",
+  "started": "2026-11-05T09:14:59",
+  "train_seconds": 921.1,
+  "peak_gpu_gb": 2.14,
+  "export_step": 100,
+  "best_validation_dice": 0.291676450969741,
+  "base_weights_sha256": "1d7b06351332d3bc8bbe6412623af4ab6e07dfef4a6718b9adc28ee7333ced92",
+  "lora_modules": [
+    "encoder.dino_encoder.blocks.8.attn.qkv",
+    "encoder.dino_encoder.blocks.8.attn.proj",
+    "encoder.dino_encoder.blocks.9.attn.qkv",
+    "encoder.dino_encoder.blocks.9.attn.proj",
+    "encoder.dino_encoder.blocks.10.attn.qkv",
+    "encoder.dino_encoder.blocks.10.attn.proj",
+    "encoder.dino_encoder.blocks.11.attn.qkv",
+    "encoder.dino_encoder.blocks.11.attn.proj"
+  ],
+  "merged_lora_modules": [
+    "encoder.dino_encoder.blocks.8.attn.qkv",
+    "encoder.dino_encoder.blocks.8.attn.proj",
+    "encoder.dino_encoder.blocks.9.attn.qkv",
+    "encoder.dino_encoder.blocks.9.attn.proj",
+    "encoder.dino_encoder.blocks.10.attn.qkv",
+    "encoder.dino_encoder.blocks.10.attn.proj",
+    "encoder.dino_encoder.blocks.11.attn.qkv",
+    "encoder.dino_encoder.blocks.11.attn.proj"
+  ],
+  "total_parameters": 100528771,
+  "trainable_parameters": 2912387,
+  "weights_file": "/home/cellfoundry/cellfoundry_results/dinocell_ft/train/20261105-091459_dinocell-ft-raw-v1-s0/models/dinocell-ft-raw-v1-s0",
+  "weights_sha256": "917464d78f78546581e0372b80abe25f867f2b54063362f489912e38af77c10d",
+  "finished": "2026-11-05T09:32:44"
+}

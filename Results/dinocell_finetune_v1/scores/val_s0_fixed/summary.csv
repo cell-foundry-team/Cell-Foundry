@@ -1,0 +1,4 @@
+model,condition,n_images,n_scored,fat_pct_true_mean,fat_pct_pred_mean,fat_pct_error_mean,fat_pct_error_std,fat_pct_abs_error_mean,fat_pct_abs_error_max,fg_dice_mean,fg_dice_std,n_true_total,n_pred_total,pooled_count_error,abs_count_error_median,F1@0.5_mean,F1@0.5_std,pooled_F1@0.5,F1@0.7_mean,F1@0.75_mean
+dinocell-ft-raw-v1-s0,control,1,1,0.32,1.52,1.2,0.0,1.2,1.2,0.278,0.0,5,103,19.6,19.6,0.093,0.0,0.093,0.074,0.056
+dinocell-ft-raw-v1-s0,differentiated,3,3,22.49,24.84,2.35,3.15,2.76,5.65,0.835,0.028,973,2534,1.604,1.342,0.399,0.144,0.366,0.229,0.18
+dinocell-ft-raw-v1-s0,all,4,4,16.95,19.01,2.06,2.63,2.37,5.65,0.696,0.279,978,2637,1.696,1.792,0.323,0.193,0.357,0.19,0.149

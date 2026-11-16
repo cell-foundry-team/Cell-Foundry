@@ -1,0 +1,19 @@
+model,source_run,image,series,condition,fat_pct_true,fat_pct_pred,fat_pct_error,fat_pct_abs_error,fg_dice,n_true,n_pred,count_diff,count_error,TP@0.5,FP@0.5,FN@0.5,precision@0.5,recall@0.5,F1@0.5,F1@0.7,F1@0.75,F1@0.9
+nnunet-2d-raw-v1-s0,20261109-110446_test_nnunet-2d-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_12,CLD-AIM-04,differentiated,16.393,21.714,5.321,5.321,0.84,347,1,-346,-0.997,0,1,347,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s0,20261109-110446_test_nnunet-2d-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_13,CLD-AIM-04,differentiated,22.298,22.163,-0.135,0.135,0.871,365,1,-364,-0.997,0,1,365,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s0,20261109-110446_test_nnunet-2d-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_23,CLD-AIM-04,differentiated,19.456,22.111,2.655,2.655,0.87,384,1,-383,-0.997,0,1,384,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s0,20261109-110446_test_nnunet-2d-raw-v1-s0,CLD-AIM-04 PIG 10x Training Positiv_26,CLD-AIM-04,differentiated,18.351,23.073,4.723,4.723,0.831,358,1,-357,-0.997,0,1,358,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s0,20261109-110446_test_nnunet-2d-raw-v1-s0,PAD11a_B1_10x_Diff,PAD11a,differentiated,20.29,21.942,1.653,1.653,0.824,361,1,-360,-0.997,0,1,361,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s0,20261109-110446_test_nnunet-2d-raw-v1-s0,PAD11c_D5_10x_Ctrl,PAD11c,control,0.082,0.364,0.282,0.282,0.312,2,1,-1,-0.5,0,1,2,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-110512_test_nnunet-2d-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_12,CLD-AIM-04,differentiated,16.393,21.478,5.086,5.086,0.844,347,1,-346,-0.997,0,1,347,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-110512_test_nnunet-2d-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_13,CLD-AIM-04,differentiated,22.298,21.576,-0.722,0.722,0.865,365,1,-364,-0.997,0,1,365,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-110512_test_nnunet-2d-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_23,CLD-AIM-04,differentiated,19.456,21.975,2.519,2.519,0.877,384,1,-383,-0.997,0,1,384,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-110512_test_nnunet-2d-raw-v1-s1,CLD-AIM-04 PIG 10x Training Positiv_26,CLD-AIM-04,differentiated,18.351,23.142,4.791,4.791,0.828,358,1,-357,-0.997,0,1,358,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-110512_test_nnunet-2d-raw-v1-s1,PAD11a_B1_10x_Diff,PAD11a,differentiated,20.29,22.559,2.27,2.27,0.82,361,1,-360,-0.997,0,1,361,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s1,20261109-110512_test_nnunet-2d-raw-v1-s1,PAD11c_D5_10x_Ctrl,PAD11c,control,0.082,0.37,0.288,0.288,0.303,2,1,-1,-0.5,0,1,2,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-110537_test_nnunet-2d-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_12,CLD-AIM-04,differentiated,16.393,21.803,5.41,5.41,0.837,347,1,-346,-0.997,0,1,347,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-110537_test_nnunet-2d-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_13,CLD-AIM-04,differentiated,22.298,22.249,-0.049,0.049,0.868,365,1,-364,-0.997,0,1,365,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-110537_test_nnunet-2d-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_23,CLD-AIM-04,differentiated,19.456,20.873,1.417,1.417,0.873,384,1,-383,-0.997,0,1,384,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-110537_test_nnunet-2d-raw-v1-s2,CLD-AIM-04 PIG 10x Training Positiv_26,CLD-AIM-04,differentiated,18.351,23.657,5.307,5.307,0.823,358,1,-357,-0.997,0,1,358,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-110537_test_nnunet-2d-raw-v1-s2,PAD11a_B1_10x_Diff,PAD11a,differentiated,20.29,22.564,2.275,2.275,0.821,361,1,-360,-0.997,0,1,361,0.0,0.0,0.0,0.0,0.0,0.0
+nnunet-2d-raw-v1-s2,20261109-110537_test_nnunet-2d-raw-v1-s2,PAD11c_D5_10x_Ctrl,PAD11c,control,0.082,0.391,0.308,0.308,0.319,2,1,-1,-0.5,0,1,2,0.0,0.0,0.0,0.0,0.0,0.0
