@@ -20,6 +20,11 @@ splits_final.json must end up in <nnUNet_preprocessed>/Dataset<ID>_PorcineBFFat/
 documentation/manual_data_splits.md). That folder is created by nnUNetv2_plan_and_preprocess,
 so run this script again with --copy-splits-to after preprocessing (see README.md).
 
+Ignore label (--ignore-dir, optional): for TRAIN cases only, pixels marked in
+<ignore-dir>/<name>_ignore.png (made by make_ignore_masks.py) that are not annotated fat get
+label 2 = "ignore" (nnU-Net documentation/ignore_label.md: excluded from the loss). Val and
+test labels are never changed. Use a new --dataset-id (e.g. 502) so 501 stays as it is.
+
 Preprocessing: --preprocess none | imes_clahe | grey_clahe, the same functions as the
 cpdino-vitb scripts (imported, not copied). nnU-Net then applies its own per-channel z-score.
 
@@ -67,6 +72,9 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--nnunet-raw", type=Path, required=True, help="nnUNet_raw folder, OUTSIDE the repo")
     p.add_argument("--dataset-id", type=int, default=501)
     p.add_argument("--preprocess", choices=sorted(PREPROCESS), default="none")
+    p.add_argument("--ignore-dir", type=Path, default=None,
+                   help="folder with <name>_ignore.png from make_ignore_masks.py; adds label 2 = ignore "
+                        "to TRAIN cases only")
     p.add_argument("--copy-splits-to", type=Path, default=None,
                    help="after nnUNetv2_plan_and_preprocess: the nnUNet_preprocessed folder; copies "
                         "splits_final.json there and exits")
@@ -87,6 +95,8 @@ def main(argv: list[str] | None = None) -> int:
     split = load_split(a.split_file)
     if split["group_dir_name"] != a.group_dir.name:
         raise SystemExit(f"Split was made for '{split['group_dir_name']}', not '{a.group_dir.name}'.")
+    if a.ignore_dir is not None and not a.ignore_dir.is_dir():
+        raise SystemExit(f"--ignore-dir {a.ignore_dir} does not exist")
     if out.exists():
         raise SystemExit(f"{out} already exists; not overwriting (use a new --dataset-id or delete it).")
     for sub in ("imagesTr", "labelsTr", "imagesTs"):
@@ -107,7 +117,17 @@ def main(argv: list[str] | None = None) -> int:
                 labels = load_labels(find_gt(a.group_dir, name))
                 if labels.shape != img.shape[:2]:
                     raise SystemExit(f"{name}: mask {labels.shape} and image {img.shape[:2]} differ in size")
-                iio.imwrite(out / "labelsTr" / f"{case}.png", (labels > 0).astype(np.uint8))
+                lab = (labels > 0).astype(np.uint8)
+                if a.ignore_dir is not None and subset == "train":
+                    ign_path = a.ignore_dir / f"{name}_ignore.png"
+                    if not ign_path.exists():
+                        raise SystemExit(f"{name}: no ignore mask {ign_path} (run make_ignore_masks.py)")
+                    ign = np.asarray(iio.imread(ign_path)) > 0
+                    if ign.shape != lab.shape:
+                        raise SystemExit(f"{name}: ignore mask {ign.shape} and label {lab.shape} differ in size")
+                    lab[ign & (lab == 0)] = 2
+                    print(f"          ignore {100 * (lab == 2).mean():.1f} % of pixels")
+                iio.imwrite(out / "labelsTr" / f"{case}.png", lab)
                 splits[subset].append(case)
             case_map[case] = {"name": name, "subset": subset}
             print(f"    {subset:5s} {case}: {name}")
@@ -115,15 +135,18 @@ def main(argv: list[str] | None = None) -> int:
     n_train = len(splits["train"]) + len(splits["val"])
     (out / "dataset.json").write_text(json.dumps({
         "channel_names": {"0": "R", "1": "G", "2": "B"},
-        "labels": {"background": 0, "fat": 1},
+        "labels": ({"background": 0, "fat": 1, "ignore": 2} if a.ignore_dir is not None
+                   else {"background": 0, "fat": 1}),
         "numTraining": n_train,
         "file_ending": ".png",
         "name": f"Dataset{a.dataset_id:03d}_{DATASET_NAME}",
-        "description": f"porcine_bf_v1 ({split['fingerprint']}), binary fat mask, preprocess={a.preprocess}",
+        "description": f"porcine_bf_v1 ({split['fingerprint']}), binary fat mask, preprocess={a.preprocess}"
+                       + (f", ignore label from {a.ignore_dir.name} (train only)" if a.ignore_dir is not None else ""),
     }, indent=2), encoding="utf-8")
     (out / "case_map.json").write_text(json.dumps({
         "split": {"name": split["name"], "fingerprint": split["fingerprint"]},
-        "preprocess": a.preprocess, "cases": case_map,
+        "preprocess": a.preprocess,
+        "ignore_dir": str(a.ignore_dir) if a.ignore_dir is not None else None, "cases": case_map,
     }, indent=2), encoding="utf-8")
     (out / "splits_final.json").write_text(json.dumps([splits], indent=2), encoding="utf-8")
 

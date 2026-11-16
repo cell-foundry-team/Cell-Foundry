@@ -95,3 +95,21 @@ uv run python scripts/export_predictions.py --pred-dir "$work/pred_test_s0" \
 - `uv sync` not run yet either: there is no `uv.lock` for this environment until someone runs it.
 - Preprocessing variants (`imes_clahe`, `grey_clahe`) need a separate dataset id each
   (e.g. `--dataset-id 502`), because the images themselves change.
+
+## Ignore label for the partial annotations (dataset 502)
+
+The biologists outlined only the fat cells they were sure of, so unoutlined fat cells are labelled
+background. With nnU-Net's ignore label (`documentation/ignore_label.md`), those pixels are left out
+of the loss instead.
+
+- `scripts/make_ignore_masks.py` (cellpose-env): zero-shot cpsam on each image; a predicted cell with
+  < 10 % overlap with any annotation and >= 150 px (the rule of `active_learning/al_cycle0.py`), grown by
+  3 px, becomes "ignore", never on top of an annotated cell. Control images get no ignore region.
+- `scripts/prepare_nnunet_dataset.py --ignore-dir ... --dataset-id 502`: label 2 = ignore, TRAIN cases only.
+  Val and test labels are unchanged; dataset 501 is untouched.
+- `scripts/score_ignore_aware.py`: val/test annotations are partial too, so a model that finds the missing
+  cells looks worse in plain `score_masks_v2.py`. This script also reports |fat % error| with the ignore
+  pixels left out of both prediction and annotation. Report it next to the plain score, never instead:
+  the ignore regions are a zero-shot estimate, not ground truth.
+
+Compare 502 against 501 with the same trainer (`nnUNetTrainer_100epochs`, 3 repeats) on val only.
